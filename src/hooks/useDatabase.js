@@ -1,0 +1,195 @@
+import { useState, useEffect, useCallback } from 'react';
+import { dbManager } from '../database/index.js';
+import { PainelDAO, AnotacaoDAO } from '../database/queries.js';
+import { Painel, Anotacao } from '../database/models/index.js';
+
+/**
+ * Hook customizado para gerenciar o banco de dados
+ */
+export function useDatabase() {
+  const [isReady, setIsReady] = useState(false);
+  const [error, setError] = useState(null);
+  const [services, setServices] = useState(null);
+
+  useEffect(() => {
+    async function initDatabase() {
+      try {
+        await dbManager.initialize();
+        
+        // Inicializar DAOs
+        const painelDAO = new PainelDAO();
+        const anotacaoDAO = new AnotacaoDAO();
+        
+        setServices({
+          painel: painelDAO,
+          anotacao: anotacaoDAO,
+          db: dbManager.getDatabase()
+        });
+        
+        setIsReady(true);
+      } catch (err) {
+        setError(err);
+        console.error('Erro ao inicializar database:', err);
+      }
+    }
+
+    initDatabase();
+  }, []);
+
+  return { isReady, error, services };
+}
+
+/**
+ * Hook para gerenciar painéis
+ */
+export function usePaineis() {
+  const { services, isReady } = useDatabase();
+  const [paineis, setPaineis] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const carregarPaineis = useCallback(async () => {
+    if (!services) return;
+    
+    try {
+      setLoading(true);
+      const result = await services.painel.findAllActive();
+      setPaineis(result);
+    } catch (error) {
+      console.error('Erro ao carregar painéis:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [services]);
+
+  const criarPainel = useCallback(async (dadosPainel) => {
+    if (!services) return;
+    
+    try {
+      console.log('📝 Dados recebidos para criar painel:', dadosPainel);
+      
+      // Criar instância da classe Painel
+      const painel = new Painel(dadosPainel);
+      
+      console.log('🔍 Painel criado:', painel);
+      console.log('✅ Painel válido?', painel.isValid());
+      console.log('🗃️ Dados para banco:', painel.toDatabase());
+      
+      await services.painel.create(painel);
+      await carregarPaineis(); // Recarregar lista
+    } catch (error) {
+      console.error('Erro ao criar painel:', error);
+      throw error;
+    }
+  }, [services, carregarPaineis]);
+
+  useEffect(() => {
+    if (isReady) {
+      carregarPaineis();
+    }
+  }, [isReady, carregarPaineis]);
+
+  return {
+    paineis,
+    loading,
+    criarPainel,
+    recarregar: carregarPaineis
+  };
+}
+
+/**
+ * Hook para gerenciar anotações
+ */
+export function useAnotacoes(painelId = null) {
+  const { services, isReady } = useDatabase();
+  const [anotacoes, setAnotacoes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const carregarAnotacoes = useCallback(async () => {
+    if (!services) {
+      console.log('🔍 Services não disponível ainda');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      console.log('🔍 Carregando anotações para painel:', painelId);
+      
+      const result = painelId 
+        ? await services.anotacao.findByPainel(painelId)
+        : await services.anotacao.findAll();
+        
+      console.log('🔍 Anotações encontradas:', result);
+      console.log('🔍 Quantidade de anotações:', result.length);
+      
+      setAnotacoes(result);
+    } catch (error) {
+      console.error('❌ Erro ao carregar anotações:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [services, painelId]);
+
+  const criarAnotacao = useCallback(async (dadosAnotacao) => {
+    if (!services) return;
+    
+    try {
+      console.log('📝 Dados recebidos para criar anotação:', dadosAnotacao);
+      
+      // Criar instância da classe Anotacao
+      const anotacao = new Anotacao(dadosAnotacao);
+      
+      console.log('🔍 Anotação criada:', anotacao);
+      console.log('✅ Anotação válida?', anotacao.isValid());
+      
+      await services.anotacao.create(anotacao);
+      await carregarAnotacoes();
+    } catch (error) {
+      console.error('Erro ao criar anotação:', error);
+      throw error;
+    }
+  }, [services, carregarAnotacoes]);
+
+  const marcarConcluida = useCallback(async (id) => {
+    if (!services) return;
+    
+    try {
+      await services.anotacao.marcarConcluida(id);
+      await carregarAnotacoes();
+    } catch (error) {
+      console.error('Erro ao marcar como concluída:', error);
+      throw error;
+    }
+  }, [services, carregarAnotacoes]);
+
+  const excluirAnotacao = useCallback(async (id) => {
+    if (!services) return;
+    
+    try {
+      await services.anotacao.delete(id);
+      await carregarAnotacoes();
+    } catch (error) {
+      console.error('Erro ao excluir anotação:', error);
+      throw error;
+    }
+  }, [services, carregarAnotacoes]);
+
+  useEffect(() => {
+    console.log('🔍 useEffect useAnotacoes executado');
+    console.log('🔍 isReady:', isReady);
+    console.log('🔍 painelId:', painelId);
+    
+    if (isReady) {
+      console.log('🔍 Chamando carregarAnotacoes...');
+      carregarAnotacoes();
+    }
+  }, [isReady, carregarAnotacoes]);
+
+  return {
+    anotacoes,
+    loading,
+    criarAnotacao,
+    marcarConcluida,
+    excluirAnotacao,
+    recarregar: carregarAnotacoes
+  };
+}
