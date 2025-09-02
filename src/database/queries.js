@@ -99,9 +99,9 @@ export class AnotacaoDAO extends BaseDAO {
     const data = anotacao.toDatabase();
 
     const result = await db.runAsync(
-      `INSERT INTO Anotacao (descricao, concluido, prioridade, data_envio, data_vencimento, painel_id, data_atualizacao)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao]
+      `INSERT INTO Anotacao (descricao, concluido, prioridade, data_envio, data_vencimento, data_atualizacao)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.data_atualizacao]
     );
 
     return result.lastInsertRowId;

@@ -12,7 +12,7 @@ export class Anotacao {
   }
 
   isValid() {
-    return this.descricao && this.descricao.trim().length > 0 && this.painel_id;
+    return this.descricao && this.descricao.trim().length > 0;
   }
 
   toDatabase() {

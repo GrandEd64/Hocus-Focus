@@ -8,25 +8,22 @@ interface TarefaSectionProps {
   anotacoes: AnotacaoEntity[];
   loading: boolean;
   onCriarAnotacao: (anotacao: Omit<AnotacaoEntity, 'id'>) => Promise<void>;
-  onMarcarConcluida: (id: number) => Promise<void>;
+  //onMarcarConcluida: (id: number) => Promise<void>;
   onExcluirAnotacao: (id: number) => Promise<void>;
-  painelSelecionado: number;
 }
 
 export function TarefaSection({
   anotacoes,
   loading,
   onCriarAnotacao,
-  onMarcarConcluida,
+  //onMarcarConcluida,
   onExcluirAnotacao,
-  painelSelecionado
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
 
   // Debug logs
   console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
   console.log('🎯 TarefaSection - loading:', loading);
-  console.log('🎯 TarefaSection - painelSelecionado:', painelSelecionado);
 
   const handleCriarAnotacao = async () => {
     if (!textoAnotacao.trim()) return;
@@ -35,8 +32,7 @@ export function TarefaSection({
       await onCriarAnotacao({
         descricao: textoAnotacao,
         concluido: 0,
-        data_envio: new Date().toISOString(),
-        painel_id: painelSelecionado
+        data_envio: new Date().toISOString()
       });
       setTextoAnotacao('');
       Alert.alert('Sucesso', 'Tarefa criada com sucesso!');
@@ -45,6 +41,7 @@ export function TarefaSection({
     }
   };
 
+  /*
   const handleMarcarConcluida = async (id: number) => {
     try {
       await onMarcarConcluida(id);
@@ -52,6 +49,9 @@ export function TarefaSection({
       Alert.alert('Erro', 'Não foi possível marcar como concluída');
     }
   };
+  */
+
+  const handleDrag = () => {};
 
   const handleExcluirAnotacao = async (id: number) => {
     Alert.alert(
@@ -114,7 +114,7 @@ export function TarefaSection({
                 <AnotacaoItem
                   key={item.id}
                   item={item}
-                  onPress={() => handleMarcarConcluida(item.id)}
+                  onPress={() => handleDrag()}
                   onLongPress={() => handleExcluirAnotacao(item.id)}
                 />
               );

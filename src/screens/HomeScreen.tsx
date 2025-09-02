@@ -13,8 +13,16 @@ export function HomeScreen() {
   return (
     <View className="bg-white flex-1 pt-16 px-4">
       <Text className="text-2xl font-bold text-center mb-6 text-slate-800">🎯 Hocus Focus</Text>
+
+      <TarefaSection 
+        anotacoes={anotacoes}
+        loading={loadingAnotacoes}
+        onCriarAnotacao={criarAnotacao}
+        onExcluirAnotacao={excluirAnotacao}
+        />
       
-      {/* Seção de Painéis */}
+
+      {/* Seção de Painéis 
       <PainelSection
         paineis={paineis}
         loading={loadingPaineis}
@@ -22,31 +30,22 @@ export function HomeScreen() {
         onPainelSelect={setPainelSelecionado}
         onCriarPainel={criarPainel}
       />
+      */}
 
-      {/* Seção de Tarefas */}
-      {painelSelecionado && (
-        <TarefaSection
-          anotacoes={anotacoes}
-          loading={loadingAnotacoes}
-          onCriarAnotacao={criarAnotacao}
-          onMarcarConcluida={marcarConcluida}
-          onExcluirAnotacao={excluirAnotacao}
-          painelSelecionado={painelSelecionado}
-        />
-      )}
-
-      {/* Mensagens de estado */}
+      {/* Mensagens de estado 
       {!painelSelecionado && paineis.length > 0 && (
         <View className="flex-1 justify-center items-center py-10">
           <Text className="text-lg text-gray-500 text-center italic">👆 Selecione um painel acima para ver as tarefas</Text>
         </View>
       )}
+      */}
 
-      {paineis.length === 0 && !loadingPaineis && (
+      
+      {/*paineis.length === 0 && !loadingPaineis && (
         <View className="flex-1 justify-center items-center py-10">
           <Text className="text-lg text-gray-500 text-center italic">🚀 Crie seu primeiro painel para começar!</Text>
         </View>
-      )}
+      )*/}
     </View>
   );
 }
