@@ -32,8 +32,8 @@ const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress }) => {
   }, [activeIndex, scales]);
 
   return (
-    <SafeAreaView edges={["bottom"]} className="bg-white">
-      <View className="flex-row border-t border-gray-200">
+    <SafeAreaView edges={["bottom"]} className="bg-slate-800">
+      <View className="flex-row border-t border-slate-700">
         {icons.map((icon, idx) => (
           <Pressable
             key={labels[idx]}
@@ -42,10 +42,10 @@ const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress }) => {
           >
             <Animated.View style={{ transform: [{ scale: scales[idx] }] }}>
               {React.cloneElement(icon, {
-                color: activeIndex === idx ? '#3b82f6' : '#6b7280',
+                color: activeIndex === idx ? '#3b82f6' : '#94a3b8', // azul ativo, cinza claro inativo
               })}
             </Animated.View>
-            <Text className={activeIndex === idx ? 'text-blue-500 font-bold text-xs mt-1' : 'text-gray-500 text-xs mt-1'}>
+            <Text className={activeIndex === idx ? 'text-blue-500 font-bold text-xs mt-1' : 'text-slate-200 text-xs mt-1'}>
               {labels[idx]}
             </Text>
           </Pressable>

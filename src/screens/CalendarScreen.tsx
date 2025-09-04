@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useDatabase } from '../hooks/useDatabase';
+import DataCard from '../components/manual/DataCard';
+
 /*a ideia é que ele seja um agrupamento, consegue enxergar no calendario 
 os paineis que voce fez de acordo com a data*/
 // Configuração de idioma para o calendário
@@ -45,31 +47,44 @@ export function CalendarScreen() {
   }, [isReady, services]);
 
   return (
-    <View className="bg-white flex-1 pt-16 px-4">
-      <Text className="text-2xl font-bold text-blue-500 text-center mb-2">Calendário</Text>
+    <View className="flex-1 pt-16">
+      <Text className="text-2xl font-bold text-blue-500 text-center mb-6">Calendário</Text>
       <Calendar
         markedDates={{
           ...markedDates,
           ...(selectedDate ? { [selectedDate]: { selected: true, selectedColor: '#3b82f6', ...markedDates[selectedDate] } } : {})
         }}
-        onDayPress={day => setSelectedDate(day.dateString)}
         theme={{
-          todayTextColor: '#3b82f6',
+          calendarBackground: 'transparent',
+          textSectionTitleColor: '#94a3b8',
+          dayTextColor: '#f1f5f9',
+          monthTextColor: '#f1f5f9',
           selectedDayBackgroundColor: '#3b82f6',
+          selectedDayTextColor: '#fff',
+          todayTextColor: '#E8E8E8',
           dotColor: '#3b82f6',
+          arrowColor: '#f1f5f9',
+          textDayFontWeight: '500',
+          textDisabledColor: '#64748b',
+
+        }}
+        onDayPress={day => setSelectedDate(day.dateString)}
+        style={{
+          backgroundColor: 'transparent',
         }}
       />
       {selectedDate && painelPorData[selectedDate] && (
         <View className="mt-4 px-4">
           <Text className="text-lg font-bold text-slate-700 mb-2">Painéis do dia:</Text>
           {painelPorData[selectedDate].map(painel => (
-            <View key={painel.id} className="mb-2 p-2 rounded bg-slate-100 border-l-4" style={{ borderLeftColor: painel.cor }}>
+            <View key={painel.id} className="mb-2 p-2 rounded bg-slate-800 border-l-4" style={{ borderLeftColor: painel.cor }}>
               <Text className="text-base font-semibold" style={{ color: painel.cor }}>{painel.nome}</Text>
               <Text className="text-xs text-gray-500">Criado em: {painel.data_criacao?.slice(0, 10)}</Text>
             </View>
           ))}
         </View>
       )}
+      <DataCard />
     </View>
   );
 }

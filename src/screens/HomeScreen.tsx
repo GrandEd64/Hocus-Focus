@@ -11,7 +11,7 @@ export function HomeScreen() {
   const { anotacoes, loading: loadingAnotacoes, criarAnotacao, marcarConcluida, excluirAnotacao } = useAnotacoes(painelSelecionado);
 
   return (
-    <View className="bg-white flex-1 pt-16 px-4">
+    <View className=" flex-1 pt-16 px-4">
       <Text className="text-2xl font-bold text-center mb-6 text-slate-800">🎯 Hocus Focus</Text>
 
       <TarefaSection 
