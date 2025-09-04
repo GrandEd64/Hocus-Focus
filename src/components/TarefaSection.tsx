@@ -85,12 +85,12 @@ export function TarefaSection({
 
   return (
     <View className="mb-6">
-      <Text className="text-xl font-bold text-slate-800 mb-4">📝 Tarefas</Text>
+      <Text className="text-xl text-white mb-4">Tarefas</Text>
       
       {/* Input para nova tarefa */}
       <View className="flex-row items-center mb-4">
         <TextInput
-          className="border border-gray-300 rounded-lg flex-1 h-12 px-4 text-base bg-white"
+          className="border text-white border-gray-300 rounded-lg flex-1 h-12 px-4 text-base"
           placeholder="Nova tarefa..."
           value={textoAnotacao}
           onChangeText={setTextoAnotacao}
@@ -104,41 +104,9 @@ export function TarefaSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView className="flex-1 min-h-[900px]" style={{ backgroundColor: '#f0f0f0'}}>
+        <ScrollView className="flex-1 min-h-[900px]">
           {/* Tarefas Pendentes */}
-          <View className="mb-6" style={{ backgroundColor: '#e0e0e0', padding: 10 }}>
-            <Text className="text-lg mb-3 font-bold text-slate-700" style={{ color: '#000', fontSize: 18 }}>⏳ Pendentes ({anotacoesPendentes.length})</Text>
-            {anotacoesPendentes.map((item) => {
-              console.log('🎯 Renderizando item pendente:', item);
-              return (
-                <AnotacaoItem
-                  key={item.id}
-                  item={item}
-                  onPress={() => handleDrag()}
-                  onLongPress={() => handleExcluirAnotacao(item.id)}
-                />
-              );
-            })}
-            {anotacoesPendentes.length === 0 && (
-              <Text className="text-center text-gray-400 italic p-5 text-base" style={{ color: '#666', textAlign: 'center' }}>Nenhuma tarefa pendente! 🎉</Text>
-            )}
-          </View>
 
-          {/* Tarefas Concluídas */}
-          <View className="mb-6">
-            <Text className="text-lg mb-3 font-bold text-slate-700">✅ Concluídas ({anotacoesConcluidas.length})</Text>
-            {anotacoesConcluidas.map((item) => (
-              <AnotacaoItem
-                key={item.id}
-                item={item}
-                onPress={() => handleExcluirAnotacao(item.id)}
-                onLongPress={() => handleExcluirAnotacao(item.id)}
-              />
-            ))}
-            {anotacoesConcluidas.length === 0 && (
-              <Text className="text-center text-gray-400 italic p-5 text-base">Nenhuma tarefa concluída ainda.</Text>
-            )}
-          </View>
         </ScrollView>
       )}
     </View>

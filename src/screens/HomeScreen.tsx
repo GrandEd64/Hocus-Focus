@@ -12,7 +12,7 @@ export function HomeScreen() {
 
   return (
     <View className=" flex-1 pt-16 px-4">
-      <Text className="text-2xl font-bold text-center mb-6 text-slate-800">🎯 Hocus Focus</Text>
+      <Text className="text-2xl font-bold text-blue-500 text-center mb-6">Hocus Focus</Text>
 
       <TarefaSection 
         anotacoes={anotacoes}
