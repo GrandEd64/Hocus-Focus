@@ -15,18 +15,18 @@ export default function App() {
 
   if (error) {
     return (
-      <View className="flex-1 justify-center items-center bg-white px-4">
+      <View className="flex-1 justify-center items-center bg-slate-800 px-4">
         <Text className="text-lg text-red-600 text-center mb-2">Erro ao inicializar banco de dados</Text>
-        <Text className="text-sm text-gray-600 text-center">{error.message}</Text>
+        <Text className="text-sm text-white text-center">{error.message}</Text>
       </View>
     );
   }
 
   if (!isReady) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 justify-center items-center bg-slate-800">
         <ActivityIndicator size="large" color="#4630eb" />
-        <Text className="mt-4 text-base text-gray-600">Inicializando Hocus Focus...</Text>
+        <Text className="mt-4 text-base text-white">Inicializando Hocus Focus...</Text>
       </View>
     );
   }
@@ -40,7 +40,7 @@ export default function App() {
   else ScreenComponent = HomeScreen;
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-slate-800">
       <View className="flex-1">
         <ScreenComponent />
       </View>
