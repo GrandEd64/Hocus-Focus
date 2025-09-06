@@ -35,7 +35,6 @@ export function TarefaSection({
         data_envio: new Date().toISOString()
       });
       setTextoAnotacao('');
-      Alert.alert('Sucesso', 'Tarefa criada com sucesso!');
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível criar a tarefa');
     }
