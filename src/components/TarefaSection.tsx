@@ -29,11 +29,6 @@ export function TarefaSection({
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
   const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
-  const [itemLayouts, setItemLayouts] = useState<Map<number, { x: number, y: number, width: number, height: number }>>(new Map());
-
-  const measureLayout = (id: number) => (x: number, y: number, width: number, height: number) => {
-    setItemLayouts(prev => new Map(prev).set(id, { x, y, width, height }));
-  };
   
   const handleReorder = (draggedId: number, dropTargetId: number) => {
     const newAnotacoes = [...localAnotacoes];
@@ -97,8 +92,6 @@ export function TarefaSection({
       ]
     );
   };
-
-  
 
   const moverAnotacao = (id: number, valorArrastado : number) => {
     const indiceAnot = localAnotacoes.findIndex(a => a.id === id);
@@ -166,10 +159,6 @@ export function TarefaSection({
               onPress={() => handleMarcarConcluida(anotacao.id)}
               onLongPress={() => handleExcluirAnotacao(anotacao.id)}
               onReorder={handleReorder}
-              measureLayout={() => {
-                const component = anotacao as any;
-                component.measure && component.measure(measureLayout(anotacao.id));
-              }}
             />
           ))}
         </ScrollView>

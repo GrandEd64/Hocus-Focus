@@ -8,19 +8,12 @@ interface AnotacaoItemProps {
   onPress: () => void;
   onLongPress: () => void;
   onReorder: (draggedId: number, dropTargetId: number) => void;
-  measureLayout: () => void;
 }
 
-export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReorder, measureLayout}: AnotacaoItemProps) {
+export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReorder}: AnotacaoItemProps) {
   const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isDragging, setIsDragging] = useState(false);
-  const itemRef = useRef<View>(null);
-  const todasTarefasRef = useRef<AnotacaoEntity[]>(todasTarefas);
-
-  useEffect(() => {
-    measureLayout();
-  }, []);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -43,24 +36,6 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReord
           onPress();
           return;
         };
-
-        itemRef.current?.measure((x, y, width, height, pageX, pageY) => {
-          const centerY = pageY + gestureState.dy + height / 2;
-          
-          // Find the closest item to drop position
-          todasTarefas.forEach(targetItem => {
-            if (targetItem.id !== id) {
-              const targetElement = targetItem as any;
-              if (targetElement.layout) {
-                console.log(targetElement.layout.y);
-                const targetCenterY = targetElement.layout.y + targetElement.layout.height / 2;
-                if (Math.abs(centerY - targetCenterY) < height) {
-                  onReorder(id, targetItem.id);
-                }
-              }
-            }
-          });
-        });
 
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },
@@ -103,7 +78,6 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReord
 
   return (
     <Animated.View
-      ref={itemRef}
       {...panResponder.panHandlers}
       style={[
         styles.container,
