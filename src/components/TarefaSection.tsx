@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  ActivityIndicator, 
+  Alert,
+  Animated,
+  PanResponder
+} from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
 import "../../global.css"
@@ -40,18 +50,6 @@ export function TarefaSection({
     }
   };
 
-  /*
-  const handleMarcarConcluida = async (id: number) => {
-    try {
-      await onMarcarConcluida(id);
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível marcar como concluída');
-    }
-  };
-  */
-
-  const handleDrag = () => {};
-
   const handleExcluirAnotacao = async (id: number) => {
     Alert.alert(
       'Confirmar Exclusão',
@@ -71,6 +69,16 @@ export function TarefaSection({
         }
       ]
     );
+  };
+
+  const placeHolderFunction = (id) => {};
+
+  const handleMarcarConcluida = async (id: number) => {
+    try {
+      await placeHolderFunction(id);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível marcar como concluída');
+    }
   };
 
   const anotacoesPendentes = anotacoes.filter((item) => item.concluido === 0);
@@ -94,6 +102,7 @@ export function TarefaSection({
           value={textoAnotacao}
           onChangeText={setTextoAnotacao}
           onSubmitEditing={handleCriarAnotacao}
+          placeholderTextColor="#878787"
         />
         <TouchableOpacity onPress={handleCriarAnotacao} className="bg-indigo-600 rounded-lg h-12 w-12 ml-3 justify-center items-center">
           <Text className="text-white text-2xl font-bold">+</Text>
@@ -105,7 +114,13 @@ export function TarefaSection({
       ) : (
         <ScrollView className="flex-1 min-h-[900px]">
           {/* Tarefas Pendentes */}
-
+          {anotacoes.map((anotacao) => (
+            <AnotacaoItem
+            item={anotacao}
+            onPress={() => handleMarcarConcluida(anotacao.id)}
+            onLongPress={() => handleExcluirAnotacao(anotacao.id)}
+            />
+          ))}
         </ScrollView>
       )}
     </View>
