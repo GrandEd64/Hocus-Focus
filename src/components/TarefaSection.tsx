@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -18,7 +18,6 @@ interface TarefaSectionProps {
   anotacoes: AnotacaoEntity[];
   loading: boolean;
   onCriarAnotacao: (anotacao: Omit<AnotacaoEntity, 'id'>) => Promise<void>;
-  //onMarcarConcluida: (id: number) => Promise<void>;
   onExcluirAnotacao: (id: number) => Promise<void>;
 }
 
@@ -26,10 +25,38 @@ export function TarefaSection({
   anotacoes,
   loading,
   onCriarAnotacao,
-  //onMarcarConcluida,
   onExcluirAnotacao,
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
+  const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
+  const [itemLayouts, setItemLayouts] = useState<Map<number, { x: number, y: number, width: number, height: number }>>(new Map());
+
+  const measureLayout = (id: number) => (x: number, y: number, width: number, height: number) => {
+    setItemLayouts(prev => new Map(prev).set(id, { x, y, width, height }));
+  };
+  
+  const handleReorder = (draggedId: number, dropTargetId: number) => {
+    const newAnotacoes = [...localAnotacoes];
+    const draggedIndex = newAnotacoes.findIndex(item => item.id === draggedId);
+    const dropIndex = newAnotacoes.findIndex(item => item.id === dropTargetId);
+
+    if (draggedIndex !== -1 && dropIndex !== -1) {
+      const [draggedItem] = newAnotacoes.splice(draggedIndex, 1);
+      newAnotacoes.splice(dropIndex, 0, draggedItem);
+      
+      // Update priorities based on new positions
+      newAnotacoes.forEach((item, index) => {
+        item.prioridade = newAnotacoes.length - index;
+      });
+
+      setLocalAnotacoes(newAnotacoes);
+      // Here you would typically call an API to persist the new order
+    }
+  };
+
+  useEffect(() => {
+    setLocalAnotacoes(anotacoes);
+  }, [anotacoes]);
 
   // Debug logs
   console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
@@ -71,6 +98,21 @@ export function TarefaSection({
     );
   };
 
+  
+
+  const moverAnotacao = (id: number, valorArrastado : number) => {
+    const indiceAnot = localAnotacoes.findIndex(a => a.id === id);
+    if(indiceAnot <= 0) return;
+
+    const item : AnotacaoEntity = localAnotacoes[indiceAnot];
+
+    const novoIndice = indiceAnot + valorArrastado;
+    item.prioridade = novoIndice;
+
+    const anotacoesAtualizadas = [...localAnotacoes];
+
+  };
+
   const placeHolderFunction = (id) => {};
 
   const handleMarcarConcluida = async (id: number) => {
@@ -80,6 +122,8 @@ export function TarefaSection({
       Alert.alert('Erro', 'Não foi possível marcar como concluída');
     }
   };
+
+  anotacoes.sort((a, b) => b.prioridade - a.prioridade);
 
   const anotacoesPendentes = anotacoes.filter((item) => item.concluido === 0);
   const anotacoesConcluidas = anotacoes.filter((item) => item.concluido === 1);
@@ -114,11 +158,18 @@ export function TarefaSection({
       ) : (
         <ScrollView className="flex-1 min-h-[900px]">
           {/* Tarefas Pendentes */}
-          {anotacoes.map((anotacao) => (
+          {localAnotacoes.map((anotacao) => (
             <AnotacaoItem
-            item={anotacao}
-            onPress={() => handleMarcarConcluida(anotacao.id)}
-            onLongPress={() => handleExcluirAnotacao(anotacao.id)}
+              key={anotacao.id}
+              item={anotacao}
+              todasTarefas={localAnotacoes}
+              onPress={() => handleMarcarConcluida(anotacao.id)}
+              onLongPress={() => handleExcluirAnotacao(anotacao.id)}
+              onReorder={handleReorder}
+              measureLayout={() => {
+                const component = anotacao as any;
+                component.measure && component.measure(measureLayout(anotacao.id));
+              }}
             />
           ))}
         </ScrollView>
