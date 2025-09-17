@@ -1,15 +1,17 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, PanResponder, GestureResponderEvent, PanResponderGestureState, StyleSheet } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 
 interface AnotacaoItemProps {
   item: AnotacaoEntity;
+  todasTarefas: AnotacaoEntity[];
   onPress: () => void;
   onLongPress: () => void;
+  onReorder: (draggedId: number, dropTargetId: number) => void;
 }
 
-export function AnotacaoItem({ item, onPress, onLongPress }: AnotacaoItemProps) {
-  const { descricao, concluido } = item;
+export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReorder}: AnotacaoItemProps) {
+  const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isDragging, setIsDragging] = useState(false);
 
@@ -27,13 +29,14 @@ export function AnotacaoItem({ item, onPress, onLongPress }: AnotacaoItemProps) 
           { useNativeDriver: false }
         )(_, gestureState);
       },
-      onPanResponderRelease: (_, gestureState) => {
+      onPanResponderRelease: async (_, gestureState) => {
         setIsDragging(false);
-        
+
         if (Math.abs(gestureState.dx) < 5 && Math.abs(gestureState.dy) < 5) {
           onPress();
-        }
-        
+          return;
+        };
+
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },
           useNativeDriver: false,
@@ -42,6 +45,7 @@ export function AnotacaoItem({ item, onPress, onLongPress }: AnotacaoItemProps) 
       },
       onPanResponderTerminate: () => {
         setIsDragging(false);
+        
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },
           useNativeDriver: false,
@@ -81,7 +85,9 @@ export function AnotacaoItem({ item, onPress, onLongPress }: AnotacaoItemProps) 
           transform: [
             { translateX: pan.x },
             { translateY: pan.y }
-          ]
+          ],
+          zIndex: isDragging ? 999 : 1,
+          elevation: isDragging ? 5 : 1,
         }
       ]}
     >
