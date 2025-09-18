@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Animated, PanResponder, GestureResponderEvent, PanResponderGestureState, StyleSheet } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, Animated, PanResponder, StyleSheet } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 
 interface AnotacaoItemProps {
@@ -7,14 +7,16 @@ interface AnotacaoItemProps {
   todasTarefas: AnotacaoEntity[];
   onPress: () => void;
   onLongPress: () => void;
-  onLayout: (event: any) => void;
   onDropAnotacao: (newY: number) => void;
+  ref: 
 }
 
-export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onLayout, onDropAnotacao}: AnotacaoItemProps) {
+export function AnotacaoItem({ item, onPress, onLongPress, onDropAnotacao, ref}: AnotacaoItemProps) {
   const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isDragging, setIsDragging] = useState(false);
+
+  const viewRef = useRef<View>(null);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -80,7 +82,7 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onLayou
   });
 
   return (
-    <Animated.View onLayout={onLayout}
+    <Animated.View ref={viewRef}
       {...panResponder.panHandlers}
       style={[
         styles.container,

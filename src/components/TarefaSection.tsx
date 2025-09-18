@@ -8,7 +8,9 @@ import {
   ActivityIndicator, 
   Alert,
   Animated,
-  PanResponder
+  PanResponder,
+  findNodeHandle,
+  UIManager
 } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
@@ -29,10 +31,12 @@ export function TarefaSection({
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
   const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
+  const anotacaoRefs = useRef<{ [key: number]: View | null }>({});
   const itemPositionsRef = useRef<Map<number, number>>(new Map());
 
   useEffect(() => {
-    setLocalAnotacoes(anotacoes);
+    if(localAnotacoes.length === 0) setLocalAnotacoes(anotacoes);
+    measureAllItems();
   }, [anotacoes]);
 
   // Debug logs
@@ -117,10 +121,20 @@ export function TarefaSection({
 
   const placeHolderFunction = (id) => {};
 
-  const handleItemLayout = (id: number, event: any) => {
-    const layout = event.nativeEvent.layout;
-    itemPositionsRef.current.set(id, layout.y);
-  };
+  const measureAllItems = () => {
+  localAnotacoes.forEach((anotacao) => {
+    const node = anotacaoRefs.current[anotacao.id];
+    if (!node) return;
+
+    const handle = findNodeHandle(node);
+    if (handle) {
+      UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+        itemPositionsRef.current.set(anotacao.id, y);
+        console.log(`Item ${anotacao.descricao}: y=${y}, pageY=${pageY}`);
+      });
+    }
+  });
+};
 
   const handleMarcarConcluida = async (id: number) => {
     try {
@@ -166,11 +180,11 @@ export function TarefaSection({
           {localAnotacoes.map((anotacao) => (
             <AnotacaoItem
               key={anotacao.id}
+              ref={(r) => (anotacaoRefs.current.set(anotacao.id, r))}
               item={anotacao}
               todasTarefas={localAnotacoes}
               onPress={() => handleMarcarConcluida(anotacao.id)}
               onLongPress={() => handleExcluirAnotacao(anotacao.id)}
-              onLayout={(event) => handleItemLayout(anotacao.id, event)}
               onDropAnotacao={(newY) => handleDropAnotacao(anotacao.id, newY)}
             />
           ))}
