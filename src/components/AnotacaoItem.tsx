@@ -7,10 +7,11 @@ interface AnotacaoItemProps {
   todasTarefas: AnotacaoEntity[];
   onPress: () => void;
   onLongPress: () => void;
-  onReorder: (draggedId: number, dropTargetId: number) => void;
+  onLayout: (event: any) => void;
+  onDropAnotacao: (newY: number) => void;
 }
 
-export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReorder}: AnotacaoItemProps) {
+export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onLayout, onDropAnotacao}: AnotacaoItemProps) {
   const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isDragging, setIsDragging] = useState(false);
@@ -36,6 +37,8 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReord
           onPress();
           return;
         };
+
+        onDropAnotacao(gestureState.dy);
 
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },
@@ -77,7 +80,7 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReord
   });
 
   return (
-    <Animated.View
+    <Animated.View onLayout={onLayout}
       {...panResponder.panHandlers}
       style={[
         styles.container,
