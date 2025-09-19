@@ -39,9 +39,18 @@ export default function App() {
 
   // Renderização condicional das telas conforme a aba selecionada
   let ScreenComponent;
-  if (activeTab === 0) ScreenComponent = HomeScreen;
-  else if (activeTab === 1) ScreenComponent = CalendarScreen;
-  else if (activeTab === 2) ScreenComponent = GradeScreen;
+  if (activeTab === 0)
+    ScreenComponent = () => (
+      <HomeScreen darkMode={darkMode} fontSize={fontSize} />
+    );
+  else if (activeTab === 1)
+    ScreenComponent = () => (
+      <CalendarScreen darkMode={darkMode} fontSize={fontSize} />
+    );
+  else if (activeTab === 2)
+    ScreenComponent = () => (
+      <GradeScreen darkMode={darkMode} fontSize={fontSize} />
+    );
   else if (activeTab === 3)
     ScreenComponent = () => (
       <ConfigScreen
