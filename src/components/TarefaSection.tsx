@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -8,7 +8,9 @@ import {
   ActivityIndicator, 
   Alert,
   Animated,
-  PanResponder
+  PanResponder,
+  findNodeHandle,
+  UIManager
 } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
@@ -29,28 +31,12 @@ export function TarefaSection({
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
   const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
-  
-  const handleReorder = (draggedId: number, dropTargetId: number) => {
-    const newAnotacoes = [...localAnotacoes];
-    const draggedIndex = newAnotacoes.findIndex(item => item.id === draggedId);
-    const dropIndex = newAnotacoes.findIndex(item => item.id === dropTargetId);
-
-    if (draggedIndex !== -1 && dropIndex !== -1) {
-      const [draggedItem] = newAnotacoes.splice(draggedIndex, 1);
-      newAnotacoes.splice(dropIndex, 0, draggedItem);
-      
-      // Update priorities based on new positions
-      newAnotacoes.forEach((item, index) => {
-        item.prioridade = newAnotacoes.length - index;
-      });
-
-      setLocalAnotacoes(newAnotacoes);
-      // Here you would typically call an API to persist the new order
-    }
-  };
+  const anotacaoRefs = useRef<{ [key: number]: View | null }>({});
+  const itemPositionsRef = useRef<Map<number, number>>(new Map());
 
   useEffect(() => {
-    setLocalAnotacoes(anotacoes);
+    if(localAnotacoes.length === 0) setLocalAnotacoes(anotacoes);
+    measureAllItems();
   }, [anotacoes]);
 
   // Debug logs
@@ -93,20 +79,62 @@ export function TarefaSection({
     );
   };
 
-  const moverAnotacao = (id: number, valorArrastado : number) => {
-    const indiceAnot = localAnotacoes.findIndex(a => a.id === id);
-    if(indiceAnot <= 0) return;
-
-    const item : AnotacaoEntity = localAnotacoes[indiceAnot];
-
-    const novoIndice = indiceAnot + valorArrastado;
-    item.prioridade = novoIndice;
-
+  const moverAnotacao = (id: number, novaPosicao: number) => {
+    console.log("alterando posições....");
     const anotacoesAtualizadas = [...localAnotacoes];
+    const [item] = anotacoesAtualizadas.splice(anotacoesAtualizadas.findIndex(a => a.id === id), 1);
+    
+    if (novaPosicao > localAnotacoes.length) novaPosicao = localAnotacoes.length;
+    if (novaPosicao !== 0) novaPosicao - 1;
 
+    anotacoesAtualizadas.splice(novaPosicao, 0, item);
+
+    anotacoesAtualizadas.forEach((anotacao, index) => {
+      anotacao.prioridade = index;
+    });
+
+    console.log(anotacoesAtualizadas);
+    setLocalAnotacoes(anotacoesAtualizadas);
+  };
+
+  const handleDropAnotacao = (id: number, droppedY: number) => {
+    const adjustedPosition = droppedY + itemPositionsRef.current.get(id);
+    const sorted = new Map([...itemPositionsRef.current.entries()].sort((a, b) => b[1] - a[1]))
+    sorted.delete(id);
+    for (const [posId, yPos] of sorted) 
+      {
+        if (0 > adjustedPosition)
+        {
+          moverAnotacao(id, 0);
+          break;
+        }
+        if(yPos < adjustedPosition) 
+        {
+          console.log(adjustedPosition);
+          const [itemAcima] = localAnotacoes.filter(a => a.id === posId);
+          console.log('Item acima:', itemAcima.descricao);
+          moverAnotacao(id, localAnotacoes.findIndex(a => a.id == posId));
+          break;
+        }
+    };
   };
 
   const placeHolderFunction = (id) => {};
+
+  const measureAllItems = () => {
+  localAnotacoes.forEach((anotacao) => {
+    const node = anotacaoRefs.current[anotacao.id];
+    if (!node) return;
+
+    const handle = findNodeHandle(node);
+    if (handle) {
+      UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+        itemPositionsRef.current.set(anotacao.id, y);
+        console.log(`Item ${anotacao.descricao}: y=${y}, pageY=${pageY}`);
+      });
+    }
+  });
+};
 
   const handleMarcarConcluida = async (id: number) => {
     try {
@@ -115,8 +143,6 @@ export function TarefaSection({
       Alert.alert('Erro', 'Não foi possível marcar como concluída');
     }
   };
-
-  anotacoes.sort((a, b) => b.prioridade - a.prioridade);
 
   const anotacoesPendentes = anotacoes.filter((item) => item.concluido === 0);
   const anotacoesConcluidas = anotacoes.filter((item) => item.concluido === 1);
@@ -154,11 +180,12 @@ export function TarefaSection({
           {localAnotacoes.map((anotacao) => (
             <AnotacaoItem
               key={anotacao.id}
+              ref={(r) => (anotacaoRefs.current.set(anotacao.id, r))}
               item={anotacao}
               todasTarefas={localAnotacoes}
               onPress={() => handleMarcarConcluida(anotacao.id)}
               onLongPress={() => handleExcluirAnotacao(anotacao.id)}
-              onReorder={handleReorder}
+              onDropAnotacao={(newY) => handleDropAnotacao(anotacao.id, newY)}
             />
           ))}
         </ScrollView>

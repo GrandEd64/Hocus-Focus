@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Animated, PanResponder, GestureResponderEvent, PanResponderGestureState, StyleSheet } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, Animated, PanResponder, StyleSheet } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 
 interface AnotacaoItemProps {
@@ -7,13 +7,16 @@ interface AnotacaoItemProps {
   todasTarefas: AnotacaoEntity[];
   onPress: () => void;
   onLongPress: () => void;
-  onReorder: (draggedId: number, dropTargetId: number) => void;
+  onDropAnotacao: (newY: number) => void;
+  ref: 
 }
 
-export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReorder}: AnotacaoItemProps) {
+export function AnotacaoItem({ item, onPress, onLongPress, onDropAnotacao, ref}: AnotacaoItemProps) {
   const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isDragging, setIsDragging] = useState(false);
+
+  const viewRef = useRef<View>(null);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -36,6 +39,8 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReord
           onPress();
           return;
         };
+
+        onDropAnotacao(gestureState.dy);
 
         Animated.spring(pan, {
           toValue: { x: 0, y: 0 },
@@ -77,7 +82,7 @@ export function AnotacaoItem({ item, todasTarefas, onPress, onLongPress, onReord
   });
 
   return (
-    <Animated.View
+    <Animated.View ref={viewRef}
       {...panResponder.panHandlers}
       style={[
         styles.container,
