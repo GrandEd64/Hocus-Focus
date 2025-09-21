@@ -6,11 +6,7 @@ import {
   TouchableOpacity, 
   ScrollView, 
   ActivityIndicator, 
-  Alert,
-  Animated,
-  PanResponder,
-  findNodeHandle,
-  UIManager
+  Alert
 } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
@@ -31,17 +27,16 @@ export function TarefaSection({
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
   const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
-  const anotacaoRefs = useRef<{ [key: number]: View | null }>({});
   const itemPositionsRef = useRef<Map<number, number>>(new Map());
 
   useEffect(() => {
     if(localAnotacoes.length === 0) setLocalAnotacoes(anotacoes);
-    measureAllItems();
+    console.log(itemPositionsRef.current);
   }, [anotacoes]);
 
   // Debug logs
-  console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
-  console.log('🎯 TarefaSection - loading:', loading);
+  //console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
+  //console.log('🎯 TarefaSection - loading:', loading);
 
   const handleCriarAnotacao = async () => {
     if (!textoAnotacao.trim()) return;
@@ -79,41 +74,58 @@ export function TarefaSection({
     );
   };
 
-  const moverAnotacao = (id: number, novaPosicao: number) => {
-    console.log("alterando posições....");
-    const anotacoesAtualizadas = [...localAnotacoes];
-    const [item] = anotacoesAtualizadas.splice(anotacoesAtualizadas.findIndex(a => a.id === id), 1);
-    
-    if (novaPosicao > localAnotacoes.length) novaPosicao = localAnotacoes.length;
-    if (novaPosicao !== 0) novaPosicao - 1;
+  const moverAnotacao = (id: number, afterId: number | null) => {
+    setLocalAnotacoes((prev) => {
+      const formatarparaString = (novaArray : AnotacaoEntity[]) => novaArray.map((anotacao) => `Descrição ${anotacao.descricao} - id ${anotacao.id} - índice ${novaArray.findIndex(a => a.id === anotacao.id)}`).join(', ');
 
-    anotacoesAtualizadas.splice(novaPosicao, 0, item);
 
-    anotacoesAtualizadas.forEach((anotacao, index) => {
-      anotacao.prioridade = index;
+      const from = prev.findIndex(a => a.id === id);
+      if (from === -1) return prev;
+
+      const next = [...prev];
+      const [item] = next.splice(from, 1);
+      
+      console.log(`Com o objeto removido, a nossa array ficou dessa forma: ${formatarparaString(next)}`);
+      console.log(`Estamos segurando o ${item.descricao} com id ${item.id}`);
+
+      let insertIndex = 0;
+      if (afterId !== null) {
+        const idxAfter = next.findIndex(a => a.id === afterId);
+        console.log(`Índice encontrado ${idxAfter}`);
+        // se não achar afterId, insere no fim
+        insertIndex = idxAfter === -1 ? next.length : idxAfter + 1;
+        console.log(`Então vamos inserir na posição "${insertIndex}"`);
+      }
+      next.splice(insertIndex, 0, item);
+
+      console.log(`Agora a array está organizada dessa forma: ${formatarparaString(next)}`);
+
+      return next.map((anotacao, i) => ({ ...anotacao, prioridade: i }));
     });
-
-    console.log(anotacoesAtualizadas);
-    setLocalAnotacoes(anotacoesAtualizadas);
   };
 
   const handleDropAnotacao = (id: number, droppedY: number) => {
+    console.log(itemPositionsRef.current);
     const adjustedPosition = droppedY + itemPositionsRef.current.get(id);
     const sorted = new Map([...itemPositionsRef.current.entries()].sort((a, b) => b[1] - a[1]))
     sorted.delete(id);
+    const [itemDropado] = localAnotacoes.filter(a => a.id === id);
     for (const [posId, yPos] of sorted) 
       {
         if (0 > adjustedPosition)
         {
-          moverAnotacao(id, 0);
+          console.log(`Não tinha nada em cima do ${itemDropado.descricao}, então ele virou o primeiro da lista}`)
+          moverAnotacao(id, null);
           break;
         }
         if(yPos < adjustedPosition) 
         {
-          console.log(adjustedPosition);
+          console.log(`Posição do item dropado "${itemDropado.descricao}" com o id ${id}: ${adjustedPosition}`);
           const [itemAcima] = localAnotacoes.filter(a => a.id === posId);
-          console.log('Item acima:', itemAcima.descricao);
-          moverAnotacao(id, localAnotacoes.findIndex(a => a.id == posId));
+          console.log(`Ele estava em baixo de "${itemAcima.descricao}" com o id ${itemAcima.id}`)
+          
+          //console.log('Item acima:', itemAcima.descricao);
+          moverAnotacao(id, itemAcima.id);
           break;
         }
     };
@@ -121,20 +133,10 @@ export function TarefaSection({
 
   const placeHolderFunction = (id) => {};
 
-  const measureAllItems = () => {
-  localAnotacoes.forEach((anotacao) => {
-    const node = anotacaoRefs.current[anotacao.id];
-    if (!node) return;
-
-    const handle = findNodeHandle(node);
-    if (handle) {
-      UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
-        itemPositionsRef.current.set(anotacao.id, y);
-        console.log(`Item ${anotacao.descricao}: y=${y}, pageY=${pageY}`);
-      });
-    }
-  });
-};
+   const handleItemLayout = (id: number, event: any) => {
+    const layout = event.nativeEvent.layout;
+    itemPositionsRef.current.set(id, layout.y);
+  };
 
   const handleMarcarConcluida = async (id: number) => {
     try {
@@ -148,10 +150,10 @@ export function TarefaSection({
   const anotacoesConcluidas = anotacoes.filter((item) => item.concluido === 1);
 
   // Debug logs para as listas filtradas
-  console.log('🎯 TarefaSection - anotacoesPendentes:', anotacoesPendentes);
-  console.log('🎯 TarefaSection - anotacoesConcluidas:', anotacoesConcluidas);
-  console.log('🎯 TarefaSection - total pendentes:', anotacoesPendentes.length);
-  console.log('🎯 TarefaSection - total concluidas:', anotacoesConcluidas.length);
+  //console.log('🎯 TarefaSection - anotacoesPendentes:', anotacoesPendentes);
+  //console.log('🎯 TarefaSection - anotacoesConcluidas:', anotacoesConcluidas);
+  //console.log('🎯 TarefaSection - total pendentes:', anotacoesPendentes.length);
+  //console.log('🎯 TarefaSection - total concluidas:', anotacoesConcluidas.length);
 
   return (
     <View className="mb-6">
@@ -180,7 +182,7 @@ export function TarefaSection({
           {localAnotacoes.map((anotacao) => (
             <AnotacaoItem
               key={anotacao.id}
-              ref={(r) => (anotacaoRefs.current.set(anotacao.id, r))}
+              onLayout={(event) => handleItemLayout(anotacao.id, event)}
               item={anotacao}
               todasTarefas={localAnotacoes}
               onPress={() => handleMarcarConcluida(anotacao.id)}

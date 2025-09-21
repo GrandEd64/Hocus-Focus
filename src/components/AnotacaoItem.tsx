@@ -8,6 +8,7 @@ interface AnotacaoItemProps {
   onPress: () => void;
   onLongPress: () => void;
   onDropAnotacao: (newY: number) => void;
+  onLayout: (event: any) => void;
 }
 
 export function AnotacaoItem({
@@ -15,12 +16,11 @@ export function AnotacaoItem({
   onPress,
   onLongPress,
   onDropAnotacao,
+  onLayout
 }: AnotacaoItemProps) {
   const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isDragging, setIsDragging] = useState(false);
-
-  const viewRef = useRef<View>(null);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -87,7 +87,7 @@ export function AnotacaoItem({
 
   return (
     <Animated.View
-      ref={viewRef}
+      onLayout={onLayout}
       {...panResponder.panHandlers}
       style={[
         styles.container,
