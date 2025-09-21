@@ -108,9 +108,7 @@ export class AnotacaoDAO extends BaseDAO {
   }
 
   async update(id, anotacao) {
-    if (!(anotacao instanceof Anotacao) || !anotacao.isValid()) {
-      throw new Error('Anotação inválida');
-    }
+    if (!(anotacao instanceof Anotacao) || !anotacao.isValid()) throw new Error('Anotação inválida');
 
     const db = await this.getDb();
     const data = anotacao.toDatabase();

@@ -10,16 +10,20 @@ type HomeScreenProps = {
 };
 
 export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
+
   const [painelSelecionado, setPainelSelecionado] = useState<number | null>(
     null
   );
+
   const { paineis, loading: loadingPaineis, criarPainel } = usePaineis();
+  
   const {
     anotacoes,
     loading: loadingAnotacoes,
     criarAnotacao,
     marcarConcluida,
     excluirAnotacao,
+    atualizarAnotacao,
   } = useAnotacoes(painelSelecionado);
 
   const textColor = darkMode ? "text-white" : "text-black";
@@ -39,6 +43,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         loading={loadingAnotacoes}
         onCriarAnotacao={criarAnotacao}
         onExcluirAnotacao={excluirAnotacao}
+        onUpdateAnotacao={atualizarAnotacao}
       />
 
       {/* Seção de Painéis 

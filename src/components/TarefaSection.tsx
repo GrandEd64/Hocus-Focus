@@ -11,12 +11,14 @@ import {
 import { AnotacaoEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
 import "../../global.css"
+import { Anotacao } from '../database/models';
 
 interface TarefaSectionProps {
   anotacoes: AnotacaoEntity[];
   loading: boolean;
   onCriarAnotacao: (anotacao: Omit<AnotacaoEntity, 'id'>) => Promise<void>;
   onExcluirAnotacao: (id: number) => Promise<void>;
+  onUpdateAnotacao: (id, anotacao) => Promise<void>;
 }
 
 export function TarefaSection({
@@ -24,15 +26,19 @@ export function TarefaSection({
   loading,
   onCriarAnotacao,
   onExcluirAnotacao,
+  onUpdateAnotacao
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
   const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
   const itemPositionsRef = useRef<Map<number, number>>(new Map());
 
   useEffect(() => {
-    if(localAnotacoes.length === 0) setLocalAnotacoes(anotacoes);
-    console.log(itemPositionsRef.current);
-  }, [anotacoes]);
+    console.log("(voz do Zangado) e.... começou");
+    if(localAnotacoes.length === 0)
+    {
+      setLocalAnotacoes(anotacoes.sort((a, b) => b.prioridade - a.prioridade));
+    };
+  }, [loading]);
 
   // Debug logs
   //console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
@@ -85,27 +91,35 @@ export function TarefaSection({
       const next = [...prev];
       const [item] = next.splice(from, 1);
       
-      console.log(`Com o objeto removido, a nossa array ficou dessa forma: ${formatarparaString(next)}`);
-      console.log(`Estamos segurando o ${item.descricao} com id ${item.id}`);
+      //console.log(`Com o objeto removido, a nossa array ficou dessa forma: ${formatarparaString(next)}`);
+      //console.log(`Estamos segurando o ${item.descricao} com id ${item.id}`);
 
       let insertIndex = 0;
       if (afterId !== null) {
         const idxAfter = next.findIndex(a => a.id === afterId);
-        console.log(`Índice encontrado ${idxAfter}`);
+        //console.log(`Índice encontrado ${idxAfter}`);
         // se não achar afterId, insere no fim
         insertIndex = idxAfter === -1 ? next.length : idxAfter + 1;
-        console.log(`Então vamos inserir na posição "${insertIndex}"`);
+        //console.log(`Então vamos inserir na posição "${insertIndex}"`);
       }
       next.splice(insertIndex, 0, item);
 
-      console.log(`Agora a array está organizada dessa forma: ${formatarparaString(next)}`);
+      //console.log(`Agora a array está organizada dessa forma: ${formatarparaString(next)}`);
 
       return next.map((anotacao, i) => ({ ...anotacao, prioridade: i }));
     });
+
+    const run = async () => {
+          for (const a of localAnotacoes) {
+            await onUpdateAnotacao(a.id, new Anotacao(a));
+          }
+        };
+        
+    run();
   };
 
   const handleDropAnotacao = (id: number, droppedY: number) => {
-    console.log(itemPositionsRef.current);
+    //console.log(itemPositionsRef.current);
     const adjustedPosition = droppedY + itemPositionsRef.current.get(id);
     const sorted = new Map([...itemPositionsRef.current.entries()].sort((a, b) => b[1] - a[1]))
     sorted.delete(id);
@@ -114,15 +128,15 @@ export function TarefaSection({
       {
         if (0 > adjustedPosition)
         {
-          console.log(`Não tinha nada em cima do ${itemDropado.descricao}, então ele virou o primeiro da lista}`)
+          //console.log(`Não tinha nada em cima do ${itemDropado.descricao}, então ele virou o primeiro da lista}`)
           moverAnotacao(id, null);
           break;
         }
         if(yPos < adjustedPosition) 
         {
-          console.log(`Posição do item dropado "${itemDropado.descricao}" com o id ${id}: ${adjustedPosition}`);
+          //console.log(`Posição do item dropado "${itemDropado.descricao}" com o id ${id}: ${adjustedPosition}`);
           const [itemAcima] = localAnotacoes.filter(a => a.id === posId);
-          console.log(`Ele estava em baixo de "${itemAcima.descricao}" com o id ${itemAcima.id}`)
+          //console.log(`Ele estava em baixo de "${itemAcima.descricao}" com o id ${itemAcima.id}`)
           
           //console.log('Item acima:', itemAcima.descricao);
           moverAnotacao(id, itemAcima.id);

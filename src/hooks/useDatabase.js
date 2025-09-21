@@ -173,6 +173,18 @@ export function useAnotacoes(painelId = null) {
     }
   }, [services, carregarAnotacoes]);
 
+  const atualizarAnotacao = useCallback(async (id, anotAtualizada) => {
+    if (!services) return;
+
+    try {
+      await services.anotacao.update(id, anotAtualizada);
+      await carregarAnotacoes();
+    } catch (error) {
+      console.error('Erro ao atualizar anotação:', error);
+      throw error;
+    }
+  }, [services, carregarAnotacoes]);
+
   useEffect(() => {
     console.log('🔍 useEffect useAnotacoes executado');
     console.log('🔍 isReady:', isReady);
@@ -190,6 +202,7 @@ export function useAnotacoes(painelId = null) {
     criarAnotacao,
     marcarConcluida,
     excluirAnotacao,
+    atualizarAnotacao,
     recarregar: carregarAnotacoes
   };
 }
