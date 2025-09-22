@@ -109,13 +109,14 @@ export function TarefaSection({
       return next.map((anotacao, i) => ({ ...anotacao, prioridade: i }));
     });
 
-    const run = async () => {
+    /*const run = async () => {
           for (const a of localAnotacoes) {
             await onUpdateAnotacao(a.id, new Anotacao(a));
           }
         };
         
     run();
+    */
   };
 
   const handleDropAnotacao = (id: number, droppedY: number) => {
