@@ -24,6 +24,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
     marcarConcluida,
     excluirAnotacao,
     atualizarAnotacao,
+    atualizarAnotacaoSemCarregar
   } = useAnotacoes(painelSelecionado);
 
   const textColor = darkMode ? "text-white" : "text-black";
@@ -43,7 +44,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         loading={loadingAnotacoes}
         onCriarAnotacao={criarAnotacao}
         onExcluirAnotacao={excluirAnotacao}
-        onUpdateAnotacao={atualizarAnotacao}
+        onUpdateAnotacao={atualizarAnotacaoSemCarregar}
       />
 
       {/* Seção de Painéis 

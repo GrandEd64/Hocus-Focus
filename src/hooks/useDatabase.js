@@ -185,6 +185,18 @@ export function useAnotacoes(painelId = null) {
     }
   }, [services, carregarAnotacoes]);
 
+  const atualizarAnotacaoSemCarregar = useCallback(async (id, anotAtualizada) => {
+    if (!services) return;
+
+    try {
+      await services.anotacao.update(id, anotAtualizada);
+      console.log("atualizado sem recarregar");
+    } catch (error) {
+      console.error('Erro ao atualizar anotação:', error);
+      throw error;
+    }
+  }, [services]);
+
   useEffect(() => {
     console.log('🔍 useEffect useAnotacoes executado');
     console.log('🔍 isReady:', isReady);
@@ -203,6 +215,7 @@ export function useAnotacoes(painelId = null) {
     marcarConcluida,
     excluirAnotacao,
     atualizarAnotacao,
+    atualizarAnotacaoSemCarregar,
     recarregar: carregarAnotacoes
   };
 }

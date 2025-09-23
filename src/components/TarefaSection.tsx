@@ -34,11 +34,11 @@ export function TarefaSection({
 
   useEffect(() => {
     console.log("(voz do Zangado) e.... começou");
-    if(localAnotacoes.length === 0)
+    if(localAnotacoes.length != anotacoes.length)
     {
       setLocalAnotacoes(anotacoes.sort((a, b) => b.prioridade - a.prioridade));
     };
-  }, [loading]);
+  }, [anotacoes]);
 
   // Debug logs
   //console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
@@ -109,14 +109,14 @@ export function TarefaSection({
       return next.map((anotacao, i) => ({ ...anotacao, prioridade: i }));
     });
 
-    /*const run = async () => {
+    const run = async () => {
           for (const a of localAnotacoes) {
             await onUpdateAnotacao(a.id, new Anotacao(a));
           }
         };
         
     run();
-    */
+    
   };
 
   const handleDropAnotacao = (id: number, droppedY: number) => {
