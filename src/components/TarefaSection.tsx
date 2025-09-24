@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { AnotacaoEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
+import CriarTarefaModal from './manual/CriarTarefaModal';
 import "../../global.css"
 import { Anotacao } from '../database/models';
 
@@ -19,6 +20,8 @@ interface TarefaSectionProps {
   onCriarAnotacao: (anotacao: Omit<AnotacaoEntity, 'id'>) => Promise<void>;
   onExcluirAnotacao: (id: number) => Promise<void>;
   onUpdateAnotacao: (id, anotacao) => Promise<void>;
+  darkMode?: boolean;
+  fontSize?: number;
 }
 
 export function TarefaSection({
@@ -26,11 +29,15 @@ export function TarefaSection({
   loading,
   onCriarAnotacao,
   onExcluirAnotacao,
-  onUpdateAnotacao
+  onUpdateAnotacao,
+  darkMode = true,
+  fontSize = 16
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
   const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
   const itemPositionsRef = useRef<Map<number, number>>(new Map());
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tarefaParaEditar, setTarefaParaEditar] = useState<AnotacaoEntity | null>(null);
 
   useEffect(() => {
     console.log("(voz do Zangado) e.... começou");
@@ -43,6 +50,13 @@ export function TarefaSection({
   // Debug logs
   //console.log('🎯 TarefaSection - anotacoes recebidas:', anotacoes);
   //console.log('🎯 TarefaSection - loading:', loading);
+
+  // Cores baseadas no tema
+  const textColor = darkMode ? "text-white" : "text-black";
+  const inputBgColor = darkMode ? "bg-neutral-800" : "bg-white";
+  const inputBorderColor = darkMode ? "border-gray-600" : "border-gray-300";
+  const inputTextColor = darkMode ? "text-white" : "text-black";
+  const placeholderColor = darkMode ? "#9ca3af" : "#6b7280";
 
   const handleCriarAnotacao = async () => {
     if (!textoAnotacao.trim()) return;
@@ -161,6 +175,46 @@ export function TarefaSection({
     }
   };
 
+  const handleDoublePress = (tarefa: AnotacaoEntity) => {
+    console.log('handleDoublePress chamado para tarefa:', tarefa.descricao);
+    setTarefaParaEditar(tarefa);
+    setModalVisible(true);
+  };
+
+  const handleCriarOuEditarTarefa = async (dadosTarefa: any) => {
+    try {
+      if (tarefaParaEditar) {
+        // Editar tarefa existente
+        const anotacaoAtualizada = new Anotacao({
+          ...tarefaParaEditar,
+          descricao: dadosTarefa.descricao,
+          prioridade: dadosTarefa.prioridade,
+          data_vencimento: dadosTarefa.data_vencimento,
+        });
+        
+        await onUpdateAnotacao(tarefaParaEditar.id, anotacaoAtualizada);
+      } else {
+        // Criar nova tarefa
+        await onCriarAnotacao({
+          descricao: dadosTarefa.descricao,
+          prioridade: dadosTarefa.prioridade,
+          data_vencimento: dadosTarefa.data_vencimento,
+          concluido: 0,
+          data_envio: new Date().toISOString()
+        });
+      }
+      
+      setTarefaParaEditar(null);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível salvar a tarefa');
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setTarefaParaEditar(null);
+  };
+
   const anotacoesPendentes = anotacoes.filter((item) => item.concluido === 0);
   const anotacoesConcluidas = anotacoes.filter((item) => item.concluido === 1);
 
@@ -172,17 +226,17 @@ export function TarefaSection({
 
   return (
     <View className="mb-6">
-      <Text className="text-xl text-white mb-4">Tarefas</Text>
+      <Text className={`text-xl ${textColor} mb-4`}>Tarefas</Text>
       
       {/* Input para nova tarefa */}
       <View className="flex-row items-center mb-4">
         <TextInput
-          className="border text-white border-gray-300 rounded-lg flex-1 h-12 px-4 text-base"
+          className={`border ${inputTextColor} ${inputBorderColor} ${inputBgColor} rounded-lg flex-1 h-12 px-4 text-base`}
           placeholder="Nova tarefa..."
           value={textoAnotacao}
           onChangeText={setTextoAnotacao}
           onSubmitEditing={handleCriarAnotacao}
-          placeholderTextColor="#878787"
+          placeholderTextColor={placeholderColor}
         />
         <TouchableOpacity onPress={handleCriarAnotacao} className="bg-indigo-600 rounded-lg h-12 w-12 ml-3 justify-center items-center">
           <Text className="text-white text-2xl font-bold">+</Text>
@@ -202,11 +256,23 @@ export function TarefaSection({
               todasTarefas={localAnotacoes}
               onPress={() => handleMarcarConcluida(anotacao.id)}
               onLongPress={() => handleExcluirAnotacao(anotacao.id)}
+              onEdit={() => handleDoublePress(anotacao)}
               onDropAnotacao={(newY) => handleDropAnotacao(anotacao.id, newY)}
+              darkMode={darkMode}
             />
           ))}
         </ScrollView>
       )}
+
+      {/* Modal para criar/editar tarefa */}
+      <CriarTarefaModal
+        visible={modalVisible}
+        onClose={handleCloseModal}
+        onCriarTarefa={handleCriarOuEditarTarefa}
+        darkMode={darkMode}
+        fontSize={fontSize}
+        tarefaParaEditar={tarefaParaEditar}
+      />
     </View>
   );
 }

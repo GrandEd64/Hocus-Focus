@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
-import { View, Text, Animated, PanResponder, StyleSheet } from "react-native";
+import { View, Text, Animated, PanResponder, StyleSheet, TouchableOpacity } from "react-native";
+import { Feather } from '@expo/vector-icons';
 import { AnotacaoEntity } from "../types/entities";
 
 interface AnotacaoItemProps {
@@ -7,16 +8,20 @@ interface AnotacaoItemProps {
   todasTarefas: AnotacaoEntity[];
   onPress: () => void;
   onLongPress: () => void;
+  onEdit: () => void;
   onDropAnotacao: (newY: number) => void;
   onLayout: (event: any) => void;
+  darkMode?: boolean;
 }
 
 export function AnotacaoItem({
   item,
   onPress,
   onLongPress,
+  onEdit,
   onDropAnotacao,
-  onLayout
+  onLayout,
+  darkMode = true
 }: AnotacaoItemProps) {
   const { descricao, concluido, prioridade, id } = item;
   const pan = useRef(new Animated.ValueXY()).current;
@@ -24,8 +29,11 @@ export function AnotacaoItem({
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false, // Não capturar inicial
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // Só ativar se houver movimento significativo (drag)
+        return Math.abs(gestureState.dx) > 10 || Math.abs(gestureState.dy) > 10;
+      },
       onPanResponderGrant: () => {
         setIsDragging(true);
         pan.setValue({ x: 0, y: 0 });
@@ -37,12 +45,6 @@ export function AnotacaoItem({
       },
       onPanResponderRelease: async (_, gestureState) => {
         setIsDragging(false);
-
-        if (Math.abs(gestureState.dx) < 5 && Math.abs(gestureState.dy) < 5) {
-          onPress();
-          return;
-        }
-
         onDropAnotacao(gestureState.dy);
 
         Animated.spring(pan, {
@@ -65,8 +67,10 @@ export function AnotacaoItem({
 
   const styles = StyleSheet.create({
     container: {
-      backgroundColor: concluido === 1 ? "#d5f4e6" : "#fff",
-      borderColor: concluido === 1 ? "#27ae60" : "#e1e8ed",
+      backgroundColor: concluido === 1 
+        ? (darkMode ? "#064e3b" : "#d5f4e6") 
+        : (darkMode ? "#374151" : "#fff"),
+      borderColor: concluido === 1 ? "#27ae60" : (darkMode ? "#4b5563" : "#e1e8ed"),
       borderWidth: 1,
       borderRadius: 8,
       padding: 16,
@@ -74,11 +78,13 @@ export function AnotacaoItem({
       elevation: 1,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
+      shadowOpacity: darkMode ? 0.1 : 0.05,
       shadowRadius: 2,
     },
     text: {
-      color: concluido === 1 ? "#27ae60" : "#2c3e50",
+      color: concluido === 1 
+        ? "#27ae60" 
+        : (darkMode ? "#f3f4f6" : "#2c3e50"),
       fontSize: 16,
       textDecorationLine:
         concluido === 1 ? ("line-through" as const) : ("none" as const),
@@ -98,9 +104,36 @@ export function AnotacaoItem({
         },
       ]}
     >
-      <Text style={styles.text} onLongPress={onLongPress}>
-        {descricao}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <TouchableOpacity 
+          onPress={onPress}
+          onLongPress={onLongPress}
+          activeOpacity={0.7}
+          style={{ flex: 1 }}
+        >
+          <Text style={styles.text}>
+            {descricao}
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          onPress={onEdit}
+          style={{
+            padding: 8,
+            marginLeft: 8,
+          }}
+          activeOpacity={0.6}
+        >
+          <Feather 
+            name="edit-2" 
+            size={16} 
+            color={concluido === 1 
+              ? "#27ae60" 
+              : (darkMode ? "#9ca3af" : "#6b7280")
+            }
+          />
+        </TouchableOpacity>
+      </View>
     </Animated.View>
   );
 }

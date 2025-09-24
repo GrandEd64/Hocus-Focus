@@ -39,23 +39,26 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         Hocus Focus
       </Text>
 
+      {/* Seção de Painéis */}
+      {/* <PainelSection
+        paineis={paineis}
+        loading={loadingPaineis}
+        painelSelecionado={painelSelecionado}
+        onPainelSelect={setPainelSelecionado}
+        onCriarPainel={criarPainel}
+      /> */}
+
+      {/* Seção de Tarefas */}
       <TarefaSection
         anotacoes={anotacoes}
         loading={loadingAnotacoes}
         onCriarAnotacao={criarAnotacao}
         onExcluirAnotacao={excluirAnotacao}
         onUpdateAnotacao={atualizarAnotacaoSemCarregar}
+        darkMode={darkMode}
+        fontSize={fontSize}
       />
-
-      {/* Seção de Painéis 
-      <PainelSection
-        paineis={paineis}
-        loading={loadingPaineis}
-        painelSelecionado={painelSelecionado}
-        onPainelSelect={setPainelSelecionado}
-        onCriarPainel={criarPainel}
-      />
-      */}
+     
 
       {/* Mensagens de estado 
       {!painelSelecionado && paineis.length > 0 && (

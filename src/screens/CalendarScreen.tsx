@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
-import { useDatabase } from "../hooks/useDatabase";
+import { useDatabase, useAnotacoes } from "../hooks/useDatabase";
 import DataCard from "../components/manual/DataCard";
 
 /*a ideia é que ele seja um agrupamento, consegue enxergar no calendario 
@@ -60,30 +60,51 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
   const [markedDates, setMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState("");
   const [painelPorData, setPainelPorData] = useState({});
+  
+  // Hook para pegar todas as anotações
+  const { anotacoes, loading: loadingAnotacoes } = useAnotacoes();
 
   useEffect(() => {
-    async function fetchPaineis() {
-      if (!isReady || !services) return;
-      const paineis = await services.painel.findAllActive();
-      // Agrupa painéis por data de criação (formato yyyy-mm-dd)
+    async function fetchAtividades() {
+      if (!isReady || !services || loadingAnotacoes) return;
+      
+      // Agrupa atividades por data de vencimento
       const marks = {};
-      const painelDataMap = {};
-      paineis.forEach((painel) => {
-        const date = painel.data_criacao?.slice(0, 10);
+      const atividadeDataMap = {};
+      
+      anotacoes.forEach((anotacao) => {
+        const date = anotacao.data_vencimento?.slice(0, 10);
         if (date) {
-          marks[date] = {
-            marked: true,
-            dotColor: painel.cor || "#4630eb",
-          };
-          if (!painelDataMap[date]) painelDataMap[date] = [];
-          painelDataMap[date].push(painel);
+          // Define cor da bolinha baseada na prioridade
+          let dotColor = "#10b981"; // verde para baixa prioridade
+          if (anotacao.prioridade >= 3) dotColor = "#ef4444"; // vermelho para alta
+          else if (anotacao.prioridade >= 2) dotColor = "#f59e0b"; // amarelo para média
+          
+          // Se já existe uma data, usa a cor da prioridade mais alta
+          if (marks[date]) {
+            const currentColor = marks[date].dotColor;
+            if (currentColor === "#10b981" && (dotColor === "#f59e0b" || dotColor === "#ef4444")) {
+              marks[date].dotColor = dotColor;
+            } else if (currentColor === "#f59e0b" && dotColor === "#ef4444") {
+              marks[date].dotColor = dotColor;
+            }
+          } else {
+            marks[date] = {
+              marked: true,
+              dotColor: dotColor,
+            };
+          }
+          
+          if (!atividadeDataMap[date]) atividadeDataMap[date] = [];
+          atividadeDataMap[date].push(anotacao);
         }
       });
+      
       setMarkedDates(marks);
-      setPainelPorData(painelDataMap);
+      setPainelPorData(atividadeDataMap);
     }
-    fetchPaineis();
-  }, [isReady, services]);
+    fetchAtividades();
+  }, [isReady, services, anotacoes, loadingAnotacoes]);
 
   const textColor = darkMode ? "text-white" : "text-black";
   const bgColor = darkMode ? "bg-neutral-900" : "bg-white";
@@ -133,33 +154,65 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
             className={`font-bold mb-2 ${textColor}`}
             style={{ fontSize: fontSize }}
           >
-            Painéis do dia:
+            Atividades do dia ({painelPorData[selectedDate].length}):
           </Text>
-          {painelPorData[selectedDate].map((painel) => (
-            <View
-              key={painel.id}
-              className={`mb-2 p-2 rounded border-l-4 ${darkMode ? "bg-slate-800" : "bg-slate-200"}`}
-              style={{ borderLeftColor: painel.cor }}
-            >
-              <Text
-                className="font-semibold"
-                style={{ color: painel.cor, fontSize }}
+          {painelPorData[selectedDate].map((atividade) => {
+            const prioridadeColor = atividade.prioridade >= 3 ? "#ef4444" : 
+                                   atividade.prioridade >= 2 ? "#f59e0b" : "#10b981";
+            const prioridadeTexto = atividade.prioridade >= 3 ? "Alta" : 
+                                   atividade.prioridade >= 2 ? "Média" : "Baixa";
+            
+            return (
+              <View
+                key={atividade.id}
+                className={`mb-2 p-3 rounded-lg border-l-4 ${darkMode ? "bg-slate-800" : "bg-slate-100"}`}
+                style={{ borderLeftColor: prioridadeColor }}
               >
-                {painel.nome}
-              </Text>
-              <Text
-                style={{
-                  color: darkMode ? "#94a3b8" : "#475569",
-                  fontSize: fontSize - 2,
-                }}
-              >
-                Criado em: {painel.data_criacao?.slice(0, 10)}
-              </Text>
-            </View>
-          ))}
+                <Text
+                  className={`font-semibold ${atividade.concluido ? 'line-through' : ''}`}
+                  style={{ 
+                    color: atividade.concluido ? "#94a3b8" : (darkMode ? "#f1f5f9" : "#1e293b"), 
+                    fontSize 
+                  }}
+                >
+                  {atividade.descricao}
+                </Text>
+                <View className="flex-row items-center mt-1">
+                  <View 
+                    className="w-2 h-2 rounded-full mr-2"
+                    style={{ backgroundColor: prioridadeColor }}
+                  />
+                  <Text
+                    style={{
+                      color: darkMode ? "#94a3b8" : "#64748b",
+                      fontSize: fontSize - 2,
+                    }}
+                  >
+                    {prioridadeTexto} prioridade
+                  </Text>
+                  {atividade.concluido === 1 && (
+                    <Text
+                      style={{
+                        color: "#10b981",
+                        fontSize: fontSize - 2,
+                        marginLeft: 8,
+                        fontWeight: "bold"
+                      }}
+                    >
+                      ✓ Concluída
+                    </Text>
+                  )}
+                </View>
+              </View>
+            );
+          })}
         </View>
       )}
-      <DataCard />
+      <DataCard 
+        tarefas={anotacoes} 
+        onAddTarefa={() => console.log('Adicionar')}
+        onTarefaPress={(tarefa) => console.log('Tarefa:', tarefa)}
+      />
     </View>
   );
 }

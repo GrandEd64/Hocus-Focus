@@ -20,8 +20,8 @@ export function ConfigScreen({
   return (
     <View className={`flex-1 p-5 ${bgColor}`}>
       <Text
-        className={`font-bold mb-5 ${textColor}`}
-        style={{ fontSize: fontSize + 2 }}
+        className={`pt-16 px-4 text-center ${textColor}`}
+        style={{ fontSize: fontSize + 4, fontWeight: "bold" }}
       >
         Configurações
       </Text>

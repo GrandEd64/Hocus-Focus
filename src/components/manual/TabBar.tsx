@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 type TabBarProps = {
   activeIndex: number;
   onTabPress: (index: number) => void;
+  darkMode?: boolean;
 };
 
 const icons = [
@@ -15,11 +16,19 @@ const icons = [
   <Feather name="settings" size={24} /> // Engrenagem
 ];
 
-const labels = ["Home", "Calendário", "Gráfico", "Config"];
+const labels = ["Home", "Calendário", "Notas", "Config"];
 
-const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress }) => {
+const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress, darkMode = true }) => {
   // Animated values for each tab
   const scales = useRef(icons.map(() => new Animated.Value(1))).current;
+
+  // Cores baseadas no tema
+  const bgColor = darkMode ? "bg-slate-800" : "bg-white";
+  const borderColor = darkMode ? "border-slate-700" : "border-gray-200";
+  const activeIconColor = "#3b82f6"; // azul sempre
+  const inactiveIconColor = darkMode ? "#94a3b8" : "#6b7280";
+  const activeLabelColor = "text-blue-500";
+  const inactiveLabelColor = darkMode ? "text-slate-200" : "text-gray-600";
 
   useEffect(() => {
     scales.forEach((scale, idx) => {
@@ -32,8 +41,8 @@ const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress }) => {
   }, [activeIndex, scales]);
 
   return (
-    <SafeAreaView edges={["bottom"]} className="bg-slate-800">
-      <View className="flex-row border-t border-slate-700">
+    <SafeAreaView edges={["bottom"]} className={bgColor}>
+      <View className={`flex-row border-t ${borderColor}`}>
         {icons.map((icon, idx) => (
           <Pressable
             key={labels[idx]}
@@ -42,10 +51,10 @@ const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress }) => {
           >
             <Animated.View style={{ transform: [{ scale: scales[idx] }] }}>
               {React.cloneElement(icon, {
-                color: activeIndex === idx ? '#3b82f6' : '#94a3b8', // azul ativo, cinza claro inativo
+                color: activeIndex === idx ? activeIconColor : inactiveIconColor,
               })}
             </Animated.View>
-            <Text className={activeIndex === idx ? 'text-blue-500 font-bold text-xs mt-1' : 'text-slate-200 text-xs mt-1'}>
+            <Text className={`${activeIndex === idx ? `${activeLabelColor} font-bold` : inactiveLabelColor} text-xs mt-1`}>
               {labels[idx]}
             </Text>
           </Pressable>
