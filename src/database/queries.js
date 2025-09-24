@@ -183,7 +183,7 @@ export class AnotacaoDAO extends BaseDAO {
  */
 export class NotaDAO extends BaseDAO {
   constructor() {
-    super('nota');
+    super('Nota');
   }
 
   async create(nota) {
@@ -195,7 +195,7 @@ export class NotaDAO extends BaseDAO {
     const data = nota.toDatabase();
 
     const result = await db.runAsync(
-      'INSERT INTO nota (nota, materia, descricao) VALUES (?, ?, ?)',
+      'INSERT INTO Nota (nota, materia, descricao) VALUES (?, ?, ?)',
       [data.nota, data.materia, data.descricao]
     );
 
@@ -205,7 +205,7 @@ export class NotaDAO extends BaseDAO {
   async findByMateria(materia) {
     const db = await this.getDb();
     return await db.getAllAsync(
-      'SELECT * FROM nota WHERE materia = ? ORDER BY data_criacao DESC',
+      'SELECT * FROM Nota WHERE materia = ? ORDER BY data_criacao DESC',
       [materia]
     );
   }
@@ -214,7 +214,7 @@ export class NotaDAO extends BaseDAO {
     const db = await this.getDb();
     return await db.getAllAsync(`
       SELECT materia, AVG(nota) as media, COUNT(*) as total_notas
-      FROM nota 
+      FROM Nota 
       WHERE materia IS NOT NULL AND materia != ''
       GROUP BY materia
       ORDER BY media DESC

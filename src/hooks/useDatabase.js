@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { dbManager } from '../database/index.js';
-import { PainelDAO, AnotacaoDAO } from '../database/queries.js';
-import { Painel, Anotacao } from '../database/models/index.js';
+import { PainelDAO, AnotacaoDAO, NotaDAO } from '../database/queries.js';
+import { Painel, Anotacao, Nota } from '../database/models/index.js';
 
 /**
  * Hook customizado para gerenciar o banco de dados
@@ -19,10 +19,12 @@ export function useDatabase() {
         // Inicializar DAOs
         const painelDAO = new PainelDAO();
         const anotacaoDAO = new AnotacaoDAO();
+        const notaDAO = new NotaDAO();
         
         setServices({
           painel: painelDAO,
           anotacao: anotacaoDAO,
+          nota: notaDAO,
           db: dbManager.getDatabase()
         });
         

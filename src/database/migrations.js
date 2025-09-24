@@ -35,7 +35,10 @@ export function createTables(db) {
         db.execSync(`
             CREATE TABLE IF NOT EXISTS Nota (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nota REAL NOT NULL
+                nota REAL NOT NULL,
+                materia TEXT,
+                descricao TEXT,
+                data_criacao TEXT DEFAULT CURRENT_TIMESTAMP
             );
         `);
 
@@ -86,6 +89,28 @@ export function migrateDatabase(db) {
         if (!columnNames.includes('data_atualizacao')) {
             db.execSync(`ALTER TABLE Anotacao ADD COLUMN data_atualizacao TEXT DEFAULT CURRENT_TIMESTAMP`);
             console.log('✅ Coluna data_atualizacao adicionada');
+        }
+        
+        // Verificar e migrar tabela Nota
+        console.log('🔍 Verificando tabela Nota...');
+        const notaTableInfo = db.getAllSync("PRAGMA table_info(Nota)");
+        const notaColumnNames = notaTableInfo.map(col => col.name);
+        
+        console.log('Colunas existentes na tabela Nota:', notaColumnNames);
+        
+        if (!notaColumnNames.includes('materia')) {
+            db.execSync(`ALTER TABLE Nota ADD COLUMN materia TEXT`);
+            console.log('✅ Coluna materia adicionada à tabela Nota');
+        }
+        
+        if (!notaColumnNames.includes('descricao')) {
+            db.execSync(`ALTER TABLE Nota ADD COLUMN descricao TEXT`);
+            console.log('✅ Coluna descricao adicionada à tabela Nota');
+        }
+        
+        if (!notaColumnNames.includes('data_criacao')) {
+            db.execSync(`ALTER TABLE Nota ADD COLUMN data_criacao TEXT DEFAULT CURRENT_TIMESTAMP`);
+            console.log('✅ Coluna data_criacao adicionada à tabela Nota');
         }
         
         console.log('✅ Migração de colunas concluída');
