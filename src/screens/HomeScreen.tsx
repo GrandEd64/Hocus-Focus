@@ -54,7 +54,8 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         loading={loadingAnotacoes}
         onCriarAnotacao={criarAnotacao}
         onExcluirAnotacao={excluirAnotacao}
-        onUpdateAnotacao={atualizarAnotacaoSemCarregar}
+        onUpdateAnotacao={atualizarAnotacao}
+        onUpdateOrdemAnotacao={atualizarAnotacaoSemCarregar}
         darkMode={darkMode}
         fontSize={fontSize}
       />

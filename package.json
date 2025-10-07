@@ -11,7 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-community/datetimepicker": "^8.4.5",
-    "expo": "^54.0.10",
+    "expo": "^54.0.12",
     "expo-sqlite": "~15.2.14",
     "expo-status-bar": "~2.2.3",
     "nativewind": "^4.1.23",
