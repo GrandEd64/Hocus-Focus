@@ -36,15 +36,21 @@ export function TarefaSection({
   fontSize = 16
 }: TarefaSectionProps) {
   const [textoAnotacao, setTextoAnotacao] = useState('');
-  const [localAnotacoes, setLocalAnotacoes] = useState<AnotacaoEntity[]>(anotacoes);
+  const [anotacoesDisplay, setAnotacoesDisplay] = useState<AnotacaoEntity[]>(anotacoes);
+  const anotacoesInfoRef = useRef<AnotacaoEntity[]>(anotacoes);
   const itemPositionsRef = useRef<Map<number, number>>(new Map());
   const [modalVisible, setModalVisible] = useState(false);
   const [tarefaParaEditar, setTarefaParaEditar] = useState<AnotacaoEntity | null>(null);
 
+  const atualizarAnotacoesFront = (novaAnotacoes : AnotacaoEntity[]) => {
+    anotacoesInfoRef.current = novaAnotacoes;
+    setAnotacoesDisplay(anotacoesInfoRef.current);
+  };
+
   useEffect(() => {
     console.log("e.... começou");
     const sorted = [...anotacoes].sort((a, b) => b.prioridade - a.prioridade);
-    setLocalAnotacoes(sorted);
+    atualizarAnotacoesFront(sorted);
   }, [anotacoes]);
 
   // Debug logs
@@ -95,36 +101,35 @@ export function TarefaSection({
   };
 
   const moverAnotacao = (id: number, afterId: number | null) => {
-    setLocalAnotacoes((prev) => {
-      const formatarparaString = (novaArray : AnotacaoEntity[]) => novaArray.map((anotacao) => `Descrição ${anotacao.descricao} - id ${anotacao.id} - índice ${novaArray.findIndex(a => a.id === anotacao.id)}`).join(', ');
+    const prev = anotacoesInfoRef.current;
+    const formatarparaString = (novaArray : AnotacaoEntity[]) => novaArray.map((anotacao) => `Descrição ${anotacao.descricao} - id ${anotacao.id} - índice ${novaArray.findIndex(a => a.id === anotacao.id)}`).join(', ');
 
 
-      const from = prev.findIndex(a => a.id === id);
-      if (from === -1) return prev;
+    const from = prev.findIndex(a => a.id === id);
+    if (from === -1) return prev;
 
-      const next = [...prev];
-      const [item] = next.splice(from, 1);
-      
-      console.log(`Com o objeto removido, a nossa array ficou dessa forma: ${formatarparaString(next)}`);
-      console.log(`Estamos segurando o ${item.descricao} com id ${item.id}`);
+    const next = [...prev];
+    const [item] = next.splice(from, 1);
+    
+    console.log(`Com o objeto removido, a nossa array ficou dessa forma: ${formatarparaString(next)}`);
+    console.log(`Estamos segurando o ${item.descricao} com id ${item.id}`);
 
-      let insertIndex = 0;
-      if (afterId !== null) {
-        const idxAfter = next.findIndex(a => a.id === afterId);
-        console.log(`Índice encontrado ${idxAfter}`);
-        // se não achar afterId, insere no fim
-        insertIndex = idxAfter === -1 ? next.length : idxAfter + 1;
-        console.log(`Então vamos inserir na posição "${insertIndex}"`);
-      }
-      next.splice(insertIndex, 0, item);
+    let insertIndex = 0;
+    if (afterId !== null) {
+      const idxAfter = next.findIndex(a => a.id === afterId);
+      console.log(`Índice encontrado ${idxAfter}`);
+      // se não achar afterId, insere no fim
+      insertIndex = idxAfter === -1 ? next.length : idxAfter + 1;
+      console.log(`Então vamos inserir na posição "${insertIndex}"`);
+    }
+    next.splice(insertIndex, 0, item);
 
-      console.log(`Agora a array está organizada dessa forma: ${formatarparaString(next)}`);
+    console.log(`Agora a array está organizada dessa forma: ${formatarparaString(next)}`);
 
-      return next.map((anotacao, i) => ({ ...anotacao, prioridade: i }));
-    });
+    atualizarAnotacoesFront(next.map((anotacao, i) => ({ ...anotacao, prioridade: i })));
 
     const run = async () => {
-          for (const a of localAnotacoes) {
+          for (const a of anotacoesInfoRef.current) {
             await onUpdateOrdemAnotacao(a.id, new Anotacao(a));
           }
         };
@@ -138,7 +143,7 @@ export function TarefaSection({
     const adjustedPosition = droppedY + itemPositionsRef.current.get(id);
     const sorted = new Map([...itemPositionsRef.current.entries()].sort((a, b) => b[1] - a[1]))
     sorted.delete(id);
-    const [itemDropado] = localAnotacoes.filter(a => a.id === id);
+    const [itemDropado] = anotacoesInfoRef.current.filter(a => a.id === id);
     for (const [posId, yPos] of sorted) 
       {
         if (0 > adjustedPosition)
@@ -150,9 +155,9 @@ export function TarefaSection({
         if(yPos < adjustedPosition) 
         {
           console.log(`Posição do item dropado "${itemDropado.descricao}" com o id ${id}: ${adjustedPosition}`);
-          console.log(`localAnotacoes atual: ${localAnotacoes.map(a => `Anotação id ${a.id}, descrição ${a.descricao}`).join(' - ')}`);
+          console.log(`anotações do display atual: ${anotacoesInfoRef.current.map(a => `Anotação id ${a.id}, descrição ${a.descricao}`).join(' - ')}`);
           console.log(`anotacoes original para efeito de comparação: ${anotacoes.map(a => `Anotação id ${a.id}, descrição ${a.descricao}`).join(' - ')}`);
-          const [itemAcima] = localAnotacoes.filter(a => a.id === posId);
+          const [itemAcima] = anotacoesInfoRef.current.filter(a => a.id === posId);
           console.log(`Ele estava em baixo de "${itemAcima.descricao}" com o id ${itemAcima.id}`);
           
           console.log('Item acima:', itemAcima.descricao);
@@ -205,7 +210,7 @@ export function TarefaSection({
           data_envio: new Date().toISOString()
         });
       }
-      
+      setAnotacoesDisplay(anotacoes);
       setTarefaParaEditar(null);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível salvar a tarefa');
@@ -250,12 +255,12 @@ export function TarefaSection({
       ) : (
         <ScrollView className="flex-1 min-h-[900px]">
           {/* Tarefas Pendentes */}
-          {localAnotacoes.map((anotacao) => (
+          {anotacoesDisplay.map((anotacao) => (
             <AnotacaoItem
               key={anotacao.id}
               onLayout={(event) => handleItemLayout(anotacao.id, event)}
               item={anotacao}
-              todasTarefas={localAnotacoes}
+              todasTarefas={anotacoesDisplay}
               onPress={() => handleMarcarConcluida(anotacao.id)}
               onLongPress={() => handleExcluirAnotacao(anotacao.id)}
               onEdit={() => handleDoublePress(anotacao)}
