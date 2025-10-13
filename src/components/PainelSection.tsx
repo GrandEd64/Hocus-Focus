@@ -7,7 +7,6 @@ import { PainelForm } from './PainelForm';
 interface PainelSectionProps {
   paineis: PainelEntity[];
   loading: boolean;
-  painelSelecionado: number | null;
   onPainelSelect: (id: number) => void;
   onCriarPainel: (painel: Omit<PainelEntity, 'id'>) => Promise<void>;
 }
@@ -15,7 +14,6 @@ interface PainelSectionProps {
 export function PainelSection({ 
   paineis, 
   loading, 
-  painelSelecionado, 
   onPainelSelect, 
   onCriarPainel 
 }: PainelSectionProps) {
@@ -49,7 +47,6 @@ export function PainelSection({
             <PainelCard
               key={painel.id}
               painel={painel}
-              isSelected={painelSelecionado === painel.id}
               onPress={() => onPainelSelect(painel.id)}
             />
           ))}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { usePaineis, useAnotacoes } from "../hooks/useDatabase";
 import { PainelSection } from "../components/PainelSection";
 import { TarefaSection } from "../components/TarefaSection";
@@ -69,11 +69,26 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
       )}
       */}
 
-      {/*paineis.length === 0 && !loadingPaineis && (
+      {paineis.length === 0 && !loadingPaineis ? (
         <View className="flex-1 justify-center items-center py-10">
-          <Text className="text-lg text-gray-500 text-center italic">🚀 Crie seu primeiro painel para começar!</Text>
+          <TouchableOpacity onPress={criarPainel} className="bg-gray-200 rounded-lg w-full h-32 justify-center">
+            <Text className="text-lg text-gray-600 text-center italic">
+              🚀 Crie seu primeiro painel para começar!
+            </Text>
+          </TouchableOpacity>
         </View>
-      )*/}
+      ) 
+        :
+      (
+        <View>
+          <PainelSection
+          paineis={paineis}
+          loading={loadingPaineis}
+          onCriarPainel={criarPainel}
+          onPainelSelect={(id) => setPainelSelecionado(id)}
+          />
+        </View>
+      )}
     </View>
   );
 }
