@@ -244,7 +244,7 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
               />
             </View>
 
-            <View className="flex-row justify-end space-x-3">
+            {/* <View className="flex-row justify-end space-x-3">
               <TouchableOpacity
                 className={`px-6 py-3 rounded-lg ${cardBg}`}
                 onPress={fecharModal}
@@ -254,14 +254,14 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="px-6 py-3 rounded-lg bg-blue-600"
+                className="px-6 py-3 rounded-lg bg-blue-500"
                 onPress={salvarEFechar}
               >
                 <Text className="text-white font-bold" style={{ fontSize }}>
                   {editId ? 'Salvar Alterações' : 'Adicionar Nota'}
                 </Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
           </View>
         </View>
       </Modal>

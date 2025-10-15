@@ -148,7 +148,7 @@ export default function NotaCard({
         {showAddButton && (
           <TouchableOpacity
             onPress={onAddNota}
-            className="bg-blue-600 rounded-full w-10 h-10 items-center justify-center"
+            className="bg-blue-400 rounded-full w-10 h-10 items-center justify-center"
             activeOpacity={0.8}
           >
             <AntDesign name="plus" size={20} color="white" />

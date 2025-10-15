@@ -1,8 +1,6 @@
 {
   "expo": {
-
     "bundler": "metro",
-
     "name": "Hocus-Focus",
     "slug": "Hocus-Focus",
     "version": "1.0.0",
@@ -10,7 +8,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -24,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.HocusFocus"
     },
     "web": {
       "favicon": "./assets/favicon.png"

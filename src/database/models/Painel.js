@@ -1,7 +1,7 @@
 export class Painel {
   constructor(data = {}) {
     this.id = data.id || null;
-    this.nome = data.nome || '';
+    this.nome = data.nome || 'Algo aqui';
     this.cor = data.cor || '#4630eb';
     this.ordem = data.ordem || 0;
     this.tipoEstudo = data.tipoEstudo || data.tipo_estudo || 1;

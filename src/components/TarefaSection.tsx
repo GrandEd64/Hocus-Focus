@@ -232,7 +232,7 @@ export function TarefaSection({
   //console.log('🎯 TarefaSection - total concluidas:', anotacoesConcluidas.length);
 
   return (
-    <View className="mb-24">
+    <View className="flex-1 max-h-96">
       <Text className={`text-xl ${textColor} mb-4`}>Tarefas</Text>
       
       {/* Input para nova tarefa */}
@@ -253,7 +253,7 @@ export function TarefaSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView className="flex-1 min-h-[900px]">
+        <ScrollView className="flex-1">
           {/* Tarefas Pendentes */}
           {anotacoesDisplay.map((anotacao) => (
             <AnotacaoItem
