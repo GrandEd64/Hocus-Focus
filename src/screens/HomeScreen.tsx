@@ -39,15 +39,6 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         Hocus Focus
       </Text>
 
-      {/* Seção de Painéis */}
-      {/* <PainelSection
-        paineis={paineis}
-        loading={loadingPaineis}
-        painelSelecionado={painelSelecionado}
-        onPainelSelect={setPainelSelecionado}
-        onCriarPainel={criarPainel}
-      /> */}
-
       {/* Seção de Tarefas */}
       <TarefaSection
         anotacoes={anotacoes}
@@ -59,15 +50,6 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         darkMode={darkMode}
         fontSize={fontSize}
       />
-     
-
-      {/* Mensagens de estado 
-      {!painelSelecionado && paineis.length > 0 && (
-        <View className="flex-1 justify-center items-center py-10">
-          <Text className="text-lg text-gray-500 text-center italic">👆 Selecione um painel acima para ver as tarefas</Text>
-        </View>
-      )}
-      */}
 
       {paineis.length === 0 && !loadingPaineis ? (
         <View className="flex-1 justify-center items-center py-10">
@@ -80,14 +62,12 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
       ) 
         :
       (
-        <View>
-          <PainelSection
-          paineis={paineis}
-          loading={loadingPaineis}
-          onCriarPainel={criarPainel}
-          onPainelSelect={(id) => setPainelSelecionado(id)}
-          />
-        </View>
+        <PainelSection
+        paineis={paineis}
+        loading={loadingPaineis}
+        onCriarPainel={criarPainel}
+        onPainelSelect={(id) => setPainelSelecionado(id)}
+        />
       )}
     </View>
   );

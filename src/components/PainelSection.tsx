@@ -20,7 +20,7 @@ export function PainelSection({
   const [mostrarForm, setMostrarForm] = useState(false);
 
   return (
-    <View className="mb-6">
+    <View>
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-xl font-bold text-slate-800">📋 Painéis</Text>
         <TouchableOpacity
@@ -42,7 +42,7 @@ export function PainelSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="max-h-32">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className='bg-lime-800 rounded-lg p-2 h-56'>
           {paineis.map((painel) => (
             <PainelCard
               key={painel.id}
