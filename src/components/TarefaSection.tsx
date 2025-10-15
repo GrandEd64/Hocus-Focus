@@ -232,7 +232,7 @@ export function TarefaSection({
   //console.log('🎯 TarefaSection - total concluidas:', anotacoesConcluidas.length);
 
   return (
-    <View className="mb-24">
+    <View>
       <Text className={`text-xl ${textColor} mb-4`}>Tarefas</Text>
       
       {/* Input para nova tarefa */}
