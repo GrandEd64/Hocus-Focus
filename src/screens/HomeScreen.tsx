@@ -15,8 +15,10 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
     null
   );
 
-  const { paineis, loading: loadingPaineis, criarPainel } = usePaineis();
+  const { paineis, loading: loadingPaineis, criarPainel, excluirPainel } = usePaineis();
   
+  const currentPainelNome = paineis.find(p => p.id === painelSelecionado)?.nome ?? null;
+
   const {
     anotacoes,
     loading: loadingAnotacoes,
@@ -49,16 +51,21 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         onUpdateOrdemAnotacao={atualizarAnotacaoSemCarregar}
         darkMode={darkMode}
         fontSize={fontSize}
+        paineis={paineis}
+        painelAtualNome={currentPainelNome}
       />
 
       {paineis.length === 0 && !loadingPaineis ? (
-        <View className="flex-1 justify-center items-center py-10">
-          <TouchableOpacity onPress={criarPainel} className="bg-gray-200 rounded-lg w-full h-32 justify-center">
-            <Text className="text-lg text-gray-600 text-center italic">
-              🚀 Crie seu primeiro painel para começar!
-            </Text>
-          </TouchableOpacity>
+        <View className="bottom-0 fixed">
+          <View className="justify-center items-center py-10">
+            <TouchableOpacity onPress={criarPainel} className="bg-gray-200 rounded-lg w-full h-32 justify-center">
+              <Text className="text-lg text-gray-600 text-center italic">
+                🚀 Crie seu primeiro painel para começar!
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
+        
       ) 
         :
       (
@@ -66,7 +73,8 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         paineis={paineis}
         loading={loadingPaineis}
         onCriarPainel={criarPainel}
-        onPainelSelect={(id) => setPainelSelecionado(id)}
+        onPainelSelect={(id) => setPainelSelecionado(id === painelSelecionado ? null : id)}
+        onExcluirPainel={excluirPainel}
         />
       )}
     </View>

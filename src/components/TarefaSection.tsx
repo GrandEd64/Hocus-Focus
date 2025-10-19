@@ -8,9 +8,9 @@ import {
   ActivityIndicator, 
   Alert
 } from 'react-native';
-import { AnotacaoEntity } from '../types/entities';
+import { AnotacaoEntity, PainelEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
-import CriarTarefaModal from './manual/CriarTarefaModal';
+import CriarTarefaModal from './manual/EditarTarefaModal';
 import "../../global.css"
 import { Anotacao } from '../database/models';
 
@@ -23,11 +23,15 @@ interface TarefaSectionProps {
   onUpdateOrdemAnotacao: (id, anotacao) => Promise<void>;
   darkMode?: boolean;
   fontSize?: number;
+  paineis?: PainelEntity[];
+  painelAtualNome?: string;
 }
 
 export function TarefaSection({
   anotacoes,
   loading,
+  paineis,
+  painelAtualNome,
   onCriarAnotacao,
   onExcluirAnotacao,
   onUpdateAnotacao,
@@ -188,28 +192,19 @@ export function TarefaSection({
     setModalVisible(true);
   };
 
-  const handleCriarOuEditarTarefa = async (dadosTarefa: any) => {
+  const handleEditarTarefa = async (dadosTarefa: any) => {
     try {
-      if (tarefaParaEditar) {
-        // Editar tarefa existente
-        const anotacaoAtualizada = new Anotacao({
-          ...tarefaParaEditar,
-          descricao: dadosTarefa.descricao,
-          prioridade: dadosTarefa.prioridade,
-          data_vencimento: dadosTarefa.data_vencimento,
-        });
+      // Editar tarefa existente
+      const anotacaoAtualizada = new Anotacao({
+        ...tarefaParaEditar,
+        descricao: dadosTarefa.descricao,
+        prioridade: dadosTarefa.prioridade,
+        data_vencimento: dadosTarefa.data_vencimento,
+        painel_id: dadosTarefa.painel_id
+      });
         
-        await onUpdateAnotacao(tarefaParaEditar.id, anotacaoAtualizada);
-      } else {
-        // Criar nova tarefa
-        await onCriarAnotacao({
-          descricao: dadosTarefa.descricao,
-          prioridade: dadosTarefa.prioridade,
-          data_vencimento: dadosTarefa.data_vencimento,
-          concluido: 0,
-          data_envio: new Date().toISOString()
-        });
-      }
+      await onUpdateAnotacao(tarefaParaEditar.id, anotacaoAtualizada);
+      
       setAnotacoesDisplay(anotacoes);
       setTarefaParaEditar(null);
     } catch (error) {
@@ -232,8 +227,13 @@ export function TarefaSection({
   //console.log('🎯 TarefaSection - total concluidas:', anotacoesConcluidas.length);
 
   return (
-    <View className="flex-1 max-h-96">
-      <Text className={`text-xl ${textColor} mb-4`}>Tarefas</Text>
+    <View className="flex-1 mb-5">
+      <View className="flex-row items-end mb-4">
+        <Text className={`text-xl ${textColor}`}>Tarefas</Text>
+        {painelAtualNome != null && (
+          <Text className={`text-xs ${textColor} ml-2`}>do painel "{painelAtualNome}"</Text>
+        )}
+      </View>
       
       {/* Input para nova tarefa */}
       <View className="flex-row items-center mb-4">
@@ -275,10 +275,11 @@ export function TarefaSection({
       <CriarTarefaModal
         visible={modalVisible}
         onClose={handleCloseModal}
-        onCriarTarefa={handleCriarOuEditarTarefa}
+        onCriarTarefa={handleEditarTarefa}
         darkMode={darkMode}
         fontSize={fontSize}
         tarefaParaEditar={tarefaParaEditar}
+        paineis={paineis}
       />
     </View>
   );

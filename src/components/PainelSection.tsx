@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { PainelEntity } from '../types/entities';
 import { PainelCard } from './PainelCard';
 import { PainelForm } from './PainelForm';
@@ -9,18 +9,42 @@ interface PainelSectionProps {
   loading: boolean;
   onPainelSelect: (id: number) => void;
   onCriarPainel: (painel: Omit<PainelEntity, 'id'>) => Promise<void>;
+  onExcluirPainel: (id: number) => void;
 }
 
 export function PainelSection({ 
   paineis, 
-  loading, 
-  onPainelSelect, 
-  onCriarPainel 
+  loading,
+  onPainelSelect,
+  onCriarPainel,
+  onExcluirPainel
 }: PainelSectionProps) {
   const [mostrarForm, setMostrarForm] = useState(false);
 
+  const handleExcluirPainel = async (id: number) => {
+      Alert.alert(
+        'Confirmar Exclusão',
+        'Tem certeza que deseja excluir esse painel?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Excluir', 
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await onExcluirPainel(id);
+              } catch (error) {
+                Alert.alert('Erro', 'Não foi possível excluir a tarefa');
+              }
+            }
+          }
+        ]
+      );
+    };
+
+
   return (
-    <View>
+    <View className='fixed bottom-0 mb-5'>
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-xl font-bold text-slate-800">📋 Painéis</Text>
         <TouchableOpacity
@@ -42,12 +66,13 @@ export function PainelSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className='bg-lime-800 rounded-lg p-2 h-56'>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className='bg-gray-300 rounded-lg p-2 h-56'>
           {paineis.map((painel) => (
             <PainelCard
               key={painel.id}
               painel={painel}
               onPress={() => onPainelSelect(painel.id)}
+              onExcluirPainel={() => handleExcluirPainel(painel.id)}
             />
           ))}
         </ScrollView>

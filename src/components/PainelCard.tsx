@@ -5,12 +5,14 @@ import { PainelEntity } from '../types/entities';
 interface PainelCardProps {
   painel: PainelEntity;
   onPress: () => void;
+  onExcluirPainel: () => void;
 }
 
-export function PainelCard({ painel, onPress }: PainelCardProps) {
+export function PainelCard({ painel, onPress, onExcluirPainel }: PainelCardProps) {
   return (
     <TouchableOpacity
       onPress={onPress}
+      onLongPress={onExcluirPainel}
       className={'rounded-xl p-4 mr-3 min-w-32 h-20 justify-center items-center shadow-lg'}
       style={{ backgroundColor: painel.cor || '#4630eb' }}
     >

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, Alert, Platform } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { PainelEntity } from '../../types/entities';
+import { Picker } from '@react-native-picker/picker';
 
 type CriarTarefaModalProps = {
   visible: boolean;
@@ -16,21 +18,24 @@ type CriarTarefaModalProps = {
   fontSize?: number;
   painelId?: number;
   tarefaParaEditar?: any;
+  paineis?: PainelEntity[];
 };
 
 export default function CriarTarefaModal({
   visible,
   onClose,
-  onCriarTarefa,
+  onCriarTarefa: onEditTarefa,
   darkMode = true,
   fontSize = 16,
   painelId,
-  tarefaParaEditar
+  tarefaParaEditar,
+  paineis
 }: CriarTarefaModalProps) {
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState(1);
   const [dataVencimento, setDataVencimento] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [painel, setPainel] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Preencher campos quando estiver editando
@@ -43,6 +48,8 @@ export default function CriarTarefaModal({
       if (vencimento) {
         setSelectedDate(new Date(vencimento));
       }
+      setPainel(tarefaParaEditar.painel_id || null);
+      console.log(`Painel de edição aberto, painelId:${tarefaParaEditar.painel_id}, painel no modal: ${painel}`);
     } else {
       // Limpar campos quando for criar nova tarefa
       setDescricao('');
@@ -58,17 +65,17 @@ export default function CriarTarefaModal({
   const cardBg = darkMode ? "bg-neutral-800" : "bg-slate-100";
   const placeholderColor = darkMode ? "#aaa" : "#666";
 
-  const handleCriar = () => {
+  const handleEdit = () => {
     if (!descricao.trim()) {
       Alert.alert('Erro', 'Por favor, digite uma descrição para a tarefa.');
       return;
     }
 
-    onCriarTarefa({
+    onEditTarefa({
       descricao: descricao.trim(),
       prioridade,
       data_vencimento: dataVencimento || undefined,
-      painel_id: painelId
+      painel_id: painel
     });
 
     // Limpar campos
@@ -77,6 +84,7 @@ export default function CriarTarefaModal({
     setDataVencimento('');
     setSelectedDate(new Date());
     setShowDatePicker(false);
+    setPainel(null);
     onClose();
   };
 
@@ -232,6 +240,31 @@ export default function CriarTarefaModal({
             )}
           </View>
 
+          {/* Painel */}
+          <View className="mb-6">
+            <Text className={`mb-2 font-medium ${textColor}`} style={{ fontSize }}>
+              Painel
+            </Text>
+            <View
+                style={{
+                  backgroundColor: '#f1f5f9',
+                  borderRadius: 8,      // rounded-lg ≈ 8
+                  overflow: 'hidden',   // ESSENCIAL para cortar bordas do Picker nativo
+                  // opcional: ajustar altura/linha para encaixar visualmente
+                }}
+              >
+                <Picker
+                  selectedValue={painel}
+                  onValueChange={(itemValue) => setPainel(itemValue)}
+                >
+                  <Picker.Item key={0} label="Nenhum" value={null} />
+                  {(paineis || []).map((p) => (
+                    <Picker.Item key={p.id} label={p.nome ?? String(p.id)} value={p.id} />
+                  ))}
+                </Picker>
+              </View>
+          </View>
+
           {/* Botões */}
           <View className="flex-row justify-end space-x-3">
             <TouchableOpacity
@@ -244,7 +277,7 @@ export default function CriarTarefaModal({
             </TouchableOpacity>
             <TouchableOpacity
               className="px-6 py-3 rounded-lg bg-blue-600"
-              onPress={handleCriar}
+              onPress={handleEdit}
             >
               <Text className="text-white font-bold" style={{ fontSize }}>
                 {tarefaParaEditar ? 'Salvar Alterações' : 'Criar Tarefa'}

@@ -3,7 +3,7 @@ export class Anotacao {
     this.id = data.id || null;
     this.descricao = data.descricao || '';
     this.concluido = data.concluido || 0;
-    this.prioridade = data.prioridade || 1;
+    this.prioridade = data.prioridade || null;
     this.data_envio = data.data_envio || new Date().toISOString();
     this.data_vencimento = data.data_vencimento || null;
     this.painel_id = data.painel_id || null;

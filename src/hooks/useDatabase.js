@@ -84,6 +84,18 @@ export function usePaineis() {
     }
   }, [services, carregarPaineis]);
 
+  const excluirPainel = useCallback(async (id) => {
+    if (!services) return;
+    
+    try {
+      await services.painel.delete(id);
+      await carregarPaineis();
+    } catch (error) {
+      console.error('Erro ao excluir anotação:', error);
+      throw error;
+    }
+  }, [services, carregarPaineis])
+
   useEffect(() => {
     if (isReady) {
       carregarPaineis();
@@ -94,6 +106,7 @@ export function usePaineis() {
     paineis,
     loading,
     criarPainel,
+    excluirPainel,
     recarregar: carregarPaineis
   };
 }
@@ -118,7 +131,7 @@ export function useAnotacoes(painelId = null) {
       
       const result = painelId 
         ? await services.anotacao.findByPainel(painelId)
-        : await services.anotacao.findAll();
+        : await services.anotacao.findAllwithNoPanel();
         
       console.log('🔍 Anotações encontradas:', result);
       console.log('🔍 Quantidade de anotações:', result.length);

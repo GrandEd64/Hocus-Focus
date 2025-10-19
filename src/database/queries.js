@@ -128,6 +128,14 @@ export class AnotacaoDAO extends BaseDAO {
     );
   }
 
+  async findAllwithNoPanel() {
+    const db = await this.getDb();
+
+    return await db.getAllAsync(
+      'SELECT * FROM Anotacao WHERE painel_id IS NULL ORDER BY prioridade DESC, data_criacao ASC'
+    );
+  }
+
   async findPendentes(painelId = null) {
     const db = await this.getDb();
     const sql = painelId 

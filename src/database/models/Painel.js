@@ -1,6 +1,6 @@
 export class Painel {
   constructor(data = {}) {
-    this.id = data.id || null;
+    this.id = data.id || 1;
     this.nome = data.nome || 'Novo painel';
     this.cor = data.cor || '#4630eb';
     this.ordem = data.ordem || 0;
