@@ -88,6 +88,12 @@ export function usePaineis() {
     if (!services) return;
     
     try {
+      const anotacoes = await services.anotacao.findWithPainel(id);
+      await Promise.all(anotacoes.map(async (anotacao) => {
+        const anotacaoAtualizada = new Anotacao({ ...anotacao });
+        anotacaoAtualizada.painel_id = null;
+        await atualizarAnotacao(anotacaoAtualizada.id, anotacaoAtualizada);
+      }));
       await services.painel.delete(id);
       await carregarPaineis();
     } catch (error) {

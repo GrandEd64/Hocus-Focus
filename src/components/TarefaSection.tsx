@@ -24,14 +24,14 @@ interface TarefaSectionProps {
   darkMode?: boolean;
   fontSize?: number;
   paineis?: PainelEntity[];
-  painelAtualNome?: string;
+  painelAtual?: PainelEntity;
 }
 
 export function TarefaSection({
   anotacoes,
   loading,
   paineis,
-  painelAtualNome,
+  painelAtual,
   onCriarAnotacao,
   onExcluirAnotacao,
   onUpdateAnotacao,
@@ -75,7 +75,8 @@ export function TarefaSection({
       await onCriarAnotacao({
         descricao: textoAnotacao,
         concluido: 0,
-        data_envio: new Date().toISOString()
+        data_envio: new Date().toISOString(),
+        painel_id: painelAtual?.id ?? null
       });
       setTextoAnotacao('');
     } catch (error) {
@@ -230,8 +231,8 @@ export function TarefaSection({
     <View className="flex-1 mb-5">
       <View className="flex-row items-end mb-4">
         <Text className={`text-xl ${textColor}`}>Tarefas</Text>
-        {painelAtualNome != null && (
-          <Text className={`text-xs ${textColor} ml-2`}>do painel "{painelAtualNome}"</Text>
+        {painelAtual != null && (
+          <Text className={`text-xs ${textColor} ml-2`}>do painel "{painelAtual.nome}"</Text>
         )}
       </View>
       
@@ -253,7 +254,7 @@ export function TarefaSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView className="flex-1">
+        <ScrollView className="flex-1" style={painelAtual && {backgroundColor:painelAtual.cor}}>
           {/* Tarefas Pendentes */}
           {anotacoesDisplay.map((anotacao) => (
             <AnotacaoItem

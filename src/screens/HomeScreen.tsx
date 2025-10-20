@@ -17,7 +17,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
 
   const { paineis, loading: loadingPaineis, criarPainel, excluirPainel } = usePaineis();
   
-  const currentPainelNome = paineis.find(p => p.id === painelSelecionado)?.nome ?? null;
+  const currentPainel = paineis.find(p => p.id === painelSelecionado) ?? null;
 
   const {
     anotacoes,
@@ -52,7 +52,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         darkMode={darkMode}
         fontSize={fontSize}
         paineis={paineis}
-        painelAtualNome={currentPainelNome}
+        painelAtual={currentPainel}
       />
 
       {paineis.length === 0 && !loadingPaineis ? (
@@ -75,6 +75,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         onCriarPainel={criarPainel}
         onPainelSelect={(id) => setPainelSelecionado(id === painelSelecionado ? null : id)}
         onExcluirPainel={excluirPainel}
+        painelSelecionado={currentPainel}
         />
       )}
     </View>

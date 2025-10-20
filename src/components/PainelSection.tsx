@@ -3,10 +3,12 @@ import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert } fr
 import { PainelEntity } from '../types/entities';
 import { PainelCard } from './PainelCard';
 import { PainelForm } from './PainelForm';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface PainelSectionProps {
   paineis: PainelEntity[];
   loading: boolean;
+  painelSelecionado: PainelEntity;
   onPainelSelect: (id: number) => void;
   onCriarPainel: (painel: Omit<PainelEntity, 'id'>) => Promise<void>;
   onExcluirPainel: (id: number) => void;
@@ -15,6 +17,7 @@ interface PainelSectionProps {
 export function PainelSection({ 
   paineis, 
   loading,
+  painelSelecionado,
   onPainelSelect,
   onCriarPainel,
   onExcluirPainel
@@ -46,7 +49,18 @@ export function PainelSection({
   return (
     <View className='fixed bottom-0 mb-5'>
       <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-xl font-bold text-slate-800">📋 Painéis</Text>
+        <View className='flex-row items-end'>
+          <Text className="text-xl font-bold text-slate-800">📋 Painéis</Text>
+          {painelSelecionado != null && (
+            <Text className={'text-xs ml-2'}>(Painel selecionado: "{painelSelecionado.nome}")</Text>
+          )}
+        </View>
+        
+        (painelSelecionado && (
+        <TouchableOpacity onPress={() => setMostrarForm(!mostrarForm)}
+        className="bg-indigo-600 rounded-lg h-12 w-12 justify-center items-center">
+          <MaterialIcons name='edit' size={20} color={'white'}/>
+        </TouchableOpacity>))
         <TouchableOpacity
           onPress={() => setMostrarForm(!mostrarForm)}
           className="bg-indigo-600 rounded-lg h-12 w-12 justify-center items-center"
