@@ -24,6 +24,7 @@ export function createTables(db) {
                 prioridade INTEGER DEFAULT 1,
                 data_envio TEXT NOT NULL,
                 data_vencimento TEXT,
+                ordem INTEGER NOT NULL,
                 painel_id INTEGER,
                 data_criacao TEXT DEFAULT CURRENT_TIMESTAMP,
                 data_atualizacao TEXT DEFAULT CURRENT_TIMESTAMP,

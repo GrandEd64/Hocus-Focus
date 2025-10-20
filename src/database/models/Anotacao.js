@@ -5,6 +5,7 @@ export class Anotacao {
     this.concluido = data.concluido || 0;
     this.prioridade = data.prioridade || null;
     this.data_envio = data.data_envio || new Date().toISOString();
+    this.ordem = data.ordem || 0;
     this.data_vencimento = data.data_vencimento || null;
     this.painel_id = data.painel_id || null;
     this.data_criacao = data.data_criacao || new Date().toISOString();
@@ -21,6 +22,7 @@ export class Anotacao {
       concluido: this.concluido,
       prioridade: this.prioridade,
       data_envio: this.data_envio,
+      ordem: this.ordem,
       data_vencimento: this.data_vencimento,
       painel_id: this.painel_id,
       data_atualizacao: new Date().toISOString()

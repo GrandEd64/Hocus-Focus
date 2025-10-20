@@ -99,9 +99,9 @@ export class AnotacaoDAO extends BaseDAO {
     const data = anotacao.toDatabase();
 
     const result = await db.runAsync(
-      `INSERT INTO Anotacao (descricao, concluido, prioridade, data_envio, data_vencimento, painel_id, data_atualizacao)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao]
+      `INSERT INTO Anotacao (descricao, concluido, prioridade, data_envio, data_vencimento, painel_id, data_atualizacao, ordem)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao, data.ordem]
     );
 
     return result.lastInsertRowId;
@@ -115,15 +115,15 @@ export class AnotacaoDAO extends BaseDAO {
 
     return await db.runAsync(
       `UPDATE Anotacao SET descricao = ?, concluido = ?, prioridade = ?, data_envio = ?, 
-       data_vencimento = ?, painel_id = ?, data_atualizacao = ? WHERE id = ?`,
-      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao, id]
+       data_vencimento = ?, painel_id = ?, data_atualizacao = ?, ordem = ? WHERE id = ?`,
+      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao, data.ordem, id]
     );
   }
 
   async findByPainel(painelId) {
     const db = await this.getDb();
     return await db.getAllAsync(
-      'SELECT * FROM Anotacao WHERE painel_id = ? ORDER BY prioridade DESC, data_criacao ASC',
+      'SELECT * FROM Anotacao WHERE painel_id = ? ORDER BY ordem ASC, data_criacao ASC',
       [painelId]
     );
   }
@@ -132,15 +132,15 @@ export class AnotacaoDAO extends BaseDAO {
     const db = await this.getDb();
 
     return await db.getAllAsync(
-      'SELECT * FROM Anotacao WHERE painel_id IS NULL ORDER BY prioridade DESC, data_criacao ASC'
+      'SELECT * FROM Anotacao WHERE painel_id IS NULL ORDER BY ordem ASC, data_criacao ASC'
     );
   }
 
   async findPendentes(painelId = null) {
     const db = await this.getDb();
     const sql = painelId 
-      ? 'SELECT * FROM Anotacao WHERE concluido = 0 AND painel_id = ? ORDER BY prioridade DESC, data_criacao ASC'
-      : 'SELECT * FROM Anotacao WHERE concluido = 0 ORDER BY prioridade DESC, data_criacao ASC';
+      ? 'SELECT * FROM Anotacao WHERE concluido = 0 AND painel_id = ? ORDER BY ordem DESC, data_criacao ASC'
+      : 'SELECT * FROM Anotacao WHERE concluido = 0 ORDER BY ordem ASC, data_criacao ASC';
     
     return painelId 
       ? await db.getAllAsync(sql, [painelId])
@@ -181,7 +181,7 @@ export class AnotacaoDAO extends BaseDAO {
       SELECT a.*, p.nome as painel_nome, p.cor as painel_cor
       FROM Anotacao a
       INNER JOIN Painel p ON a.painel_id = p.id
-      ORDER BY a.prioridade DESC, a.data_criacao ASC
+      ORDER BY a.ordem DESC, a.data_criacao ASC
     `);
   }
 }

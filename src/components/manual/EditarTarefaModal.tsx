@@ -8,7 +8,7 @@ import { Picker } from '@react-native-picker/picker';
 type CriarTarefaModalProps = {
   visible: boolean;
   onClose: () => void;
-  onCriarTarefa: (tarefa: {
+  onEditTarefa: (tarefa: {
     descricao: string;
     prioridade: number;
     data_vencimento?: string;
@@ -24,7 +24,7 @@ type CriarTarefaModalProps = {
 export default function CriarTarefaModal({
   visible,
   onClose,
-  onCriarTarefa: onEditTarefa,
+  onEditTarefa,
   darkMode = true,
   fontSize = 16,
   painelId,
@@ -257,7 +257,7 @@ export default function CriarTarefaModal({
                   selectedValue={painel}
                   onValueChange={(itemValue) => setPainel(itemValue)}
                 >
-                  <Picker.Item key={0} label="Nenhum" value={null} />
+                  <Picker.Item key={0} label="Nenhum" value={null} style={{color:'black'}} />
                   {(paineis || []).map((p) => (
                     <Picker.Item key={p.id} label={p.nome ?? String(p.id)} value={p.id} style={{color:p.cor}} />
                   ))}
