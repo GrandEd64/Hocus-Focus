@@ -56,13 +56,13 @@ export default function EditarPainelModal({ visible, onClose, painel, onSaved }:
               value={name}
               onChangeText={setName}
               placeholder="Nome do painel"
-              className="border rounded px-3 py-2"
+              className="border border-gray-300 rounded-lg h-12 px-4 text-base bg-white"
             />
           </View>
 
           <View className="mb-4">
             <Text className="mb-2 font-medium">Cor</Text>
-            <View className="flex-row flex-wrap">
+            <View className="flex-row flex-wrap justify-center">
               {presetColors.map((c) => (
                 <TouchableOpacity
                   key={c}

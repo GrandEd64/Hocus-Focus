@@ -97,7 +97,7 @@ export function usePaineis() {
       await services.painel.delete(id);
       await carregarPaineis();
     } catch (error) {
-      console.error('Erro ao excluir anotação:', error);
+      console.error('Erro ao excluir painel:', error);
       throw error;
     }
   }, [services, carregarPaineis])

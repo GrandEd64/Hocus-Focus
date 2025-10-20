@@ -76,7 +76,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         onPainelSelect={(id) => setPainelSelecionado(id === painelSelecionado ? null : id)}
         onExcluirPainel={excluirPainel}
         painelSelecionado={currentPainel}
-  onPainelUpdated={() => { if (recarregar) recarregar(); }}
+        onPainelUpdated={() => { if (recarregar) recarregar(); }}
         />
       )}
     </View>

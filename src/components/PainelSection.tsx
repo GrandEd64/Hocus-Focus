@@ -41,7 +41,7 @@ export function PainelSection({
               try {
                 await onExcluirPainel(id);
               } catch (error) {
-                Alert.alert('Erro', 'Não foi possível excluir a tarefa');
+                Alert.alert('Erro', 'Não foi possível excluir o painel');
               }
             }
           }
@@ -91,11 +91,13 @@ export function PainelSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className='bg-gray-300 rounded-lg p-2 h-56'>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} 
+        className='bg-gray-300 rounded-lg h-42' contentContainerStyle={{gap:13, padding:10, justifyContent:'flex-start', flexGrow:1}}>
           {paineis.map((painel) => (
             <PainelCard
               key={painel.id}
               painel={painel}
+              selecionado={painelSelecionado?.id === painel.id || false}
               onPress={() => onPainelSelect(painel.id)}
               onExcluirPainel={() => handleExcluirPainel(painel.id)}
             />

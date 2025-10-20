@@ -259,7 +259,7 @@ export default function CriarTarefaModal({
                 >
                   <Picker.Item key={0} label="Nenhum" value={null} />
                   {(paineis || []).map((p) => (
-                    <Picker.Item key={p.id} label={p.nome ?? String(p.id)} value={p.id} />
+                    <Picker.Item key={p.id} label={p.nome ?? String(p.id)} value={p.id} style={{color:p.cor}} />
                   ))}
                 </Picker>
               </View>
