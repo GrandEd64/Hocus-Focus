@@ -254,7 +254,7 @@ export function TarefaSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView className="flex-1" style={painelAtual && {backgroundColor:painelAtual.cor}}>
+        <ScrollView className="flex-1" style={painelAtual && {borderWidth: 1, borderRadius: 12, padding: 12, backgroundColor: '#f1f1f1', borderColor:painelAtual.cor}}>
           {/* Tarefas Pendentes */}
           {anotacoesDisplay.map((anotacao) => (
             <AnotacaoItem

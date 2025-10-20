@@ -15,7 +15,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
     null
   );
 
-  const { paineis, loading: loadingPaineis, criarPainel, excluirPainel } = usePaineis();
+  const { paineis, loading: loadingPaineis, criarPainel, excluirPainel, recarregar } = usePaineis();
   
   const currentPainel = paineis.find(p => p.id === painelSelecionado) ?? null;
 
@@ -69,13 +69,14 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
       ) 
         :
       (
-        <PainelSection
+  <PainelSection
         paineis={paineis}
         loading={loadingPaineis}
         onCriarPainel={criarPainel}
         onPainelSelect={(id) => setPainelSelecionado(id === painelSelecionado ? null : id)}
         onExcluirPainel={excluirPainel}
         painelSelecionado={currentPainel}
+  onPainelUpdated={() => { if (recarregar) recarregar(); }}
         />
       )}
     </View>

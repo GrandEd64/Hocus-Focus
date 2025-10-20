@@ -88,11 +88,11 @@ export function usePaineis() {
     if (!services) return;
     
     try {
-      const anotacoes = await services.anotacao.findWithPainel(id);
+      const anotacoes = await services.anotacao.findByPainel(id);
       await Promise.all(anotacoes.map(async (anotacao) => {
         const anotacaoAtualizada = new Anotacao({ ...anotacao });
         anotacaoAtualizada.painel_id = null;
-        await atualizarAnotacao(anotacaoAtualizada.id, anotacaoAtualizada);
+        await services.anotacao.update(anotacaoAtualizada.id, anotacaoAtualizada);
       }));
       await services.painel.delete(id);
       await carregarPaineis();
@@ -101,6 +101,22 @@ export function usePaineis() {
       throw error;
     }
   }, [services, carregarPaineis])
+
+  const atualizarPainel = useCallback(async (id, camposAtualizados) => {
+    if (!services) return;
+
+    try {
+      const existente = await services.painel.findById(id);
+      if (!existente) throw new Error('Painel não encontrado');
+      const novosDados = { ...existente, ...camposAtualizados };
+      const painel = new Painel(novosDados);
+      await services.painel.update(id, painel);
+      await carregarPaineis();
+    } catch (error) {
+      console.error('Erro ao atualizar painel:', error);
+      throw error;
+    }
+  }, [services, carregarPaineis]);
 
   useEffect(() => {
     if (isReady) {
@@ -113,6 +129,7 @@ export function usePaineis() {
     loading,
     criarPainel,
     excluirPainel,
+    atualizarPainel,
     recarregar: carregarPaineis
   };
 }

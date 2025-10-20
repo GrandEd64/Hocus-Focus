@@ -4,7 +4,7 @@ import { PainelEntity } from '../types/entities';
 import { PainelCard } from './PainelCard';
 import { PainelForm } from './PainelForm';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import EditarPainelModal from './manual/EditarPainelModal';
 interface PainelSectionProps {
   paineis: PainelEntity[];
   loading: boolean;
@@ -12,6 +12,7 @@ interface PainelSectionProps {
   onPainelSelect: (id: number) => void;
   onCriarPainel: (painel: Omit<PainelEntity, 'id'>) => Promise<void>;
   onExcluirPainel: (id: number) => void;
+  onPainelUpdated?: () => void;
 }
 
 export function PainelSection({ 
@@ -20,9 +21,12 @@ export function PainelSection({
   painelSelecionado,
   onPainelSelect,
   onCriarPainel,
-  onExcluirPainel
+  onExcluirPainel,
+  onPainelUpdated
 }: PainelSectionProps) {
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [editarVisible, setEditarVisible] = useState(false);
+  const [painelParaEditar, setPainelParaEditar] = useState<PainelEntity | null>(null);
 
   const handleExcluirPainel = async (id: number) => {
       Alert.alert(
@@ -55,18 +59,25 @@ export function PainelSection({
             <Text className={'text-xs ml-2'}>(Painel selecionado: "{painelSelecionado.nome}")</Text>
           )}
         </View>
-        
-        (painelSelecionado && (
-        <TouchableOpacity onPress={() => setMostrarForm(!mostrarForm)}
-        className="bg-indigo-600 rounded-lg h-12 w-12 justify-center items-center">
-          <MaterialIcons name='edit' size={20} color={'white'}/>
-        </TouchableOpacity>))
+        <View className='flex-row gap-2'>
+        {painelSelecionado && (
+          <TouchableOpacity
+            onPress={() => {
+              setPainelParaEditar(painelSelecionado);
+              setEditarVisible(true);
+            }}
+            className="bg-indigo-600 rounded-lg h-12 w-12 justify-center items-center"
+          >
+            <MaterialIcons name='edit' size={20} color={'white'} />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           onPress={() => setMostrarForm(!mostrarForm)}
           className="bg-indigo-600 rounded-lg h-12 w-12 justify-center items-center"
-        >
+          >
           <Text className="text-white text-2xl font-bold">+</Text>
         </TouchableOpacity>
+          </View>
       </View>
 
       {mostrarForm && (
@@ -91,6 +102,16 @@ export function PainelSection({
           ))}
         </ScrollView>
       )}
+      <EditarPainelModal
+        visible={editarVisible}
+        onClose={() => setEditarVisible(false)}
+        painel={painelParaEditar}
+        onSaved={() => {
+          setEditarVisible(false);
+          // emitir evento de atualização para o pai, se fornecido
+          if (onPainelUpdated) onPainelUpdated();
+        }}
+      />
     </View>
   );
 }

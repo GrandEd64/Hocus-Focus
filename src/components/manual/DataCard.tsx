@@ -44,8 +44,8 @@ console.log(tarefas);
                 <View className={`p-4 items-center rounded-lg w-20 h-20 ${item.concluido ? 'bg-green-500' : 'bg-blue-400'}`}>
                     {dataFormatada ? (
                         <>
-                            <Text className="text-white text-2xl font-bold">{dataFormatada.dia}</Text>
-                            <Text className="text-white text-xs">{dataFormatada.mes}</Text>
+                            <Text className="text-black text-2xl font-bold">{dataFormatada.dia}</Text>
+                            <Text className="text-black text-xs">{dataFormatada.mes}</Text>
                         </>
                     ) : (
                         <Text className="text-white text-xs">Sem data</Text>
@@ -54,7 +54,7 @@ console.log(tarefas);
                 <View className="ml-4 flex-1 rounded-lg">
                     <View className="flex-row justify-between items-start">
                         <Text 
-                            className={`flex-1 ${item.concluido ? ' line-through' : textColor}`} 
+                            className={`flex-1 text-black${item.concluido ? ' line-through' : textColor}`} 
                             numberOfLines={2}
                             style={{ fontSize: fontSize + 2 }}
                         >
