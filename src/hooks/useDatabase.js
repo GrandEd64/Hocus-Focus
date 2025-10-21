@@ -254,6 +254,6 @@ export function useAnotacoes(painelId = null) {
     excluirAnotacao,
     atualizarAnotacao,
     atualizarAnotacaoSemCarregar,
-    recarregar: carregarAnotacoes
+    recarregarAnotacoes: carregarAnotacoes
   };
 }

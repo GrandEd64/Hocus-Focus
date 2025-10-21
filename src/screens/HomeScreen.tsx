@@ -26,6 +26,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
     marcarConcluida,
     excluirAnotacao,
     atualizarAnotacao,
+    recarregarAnotacoes,
     atualizarAnotacaoSemCarregar
   } = useAnotacoes(painelSelecionado);
 
@@ -74,7 +75,7 @@ export function HomeScreen({ darkMode, fontSize }: HomeScreenProps) {
         loading={loadingPaineis}
         onCriarPainel={criarPainel}
         onPainelSelect={(id) => setPainelSelecionado(id === painelSelecionado ? null : id)}
-        onExcluirPainel={excluirPainel}
+        onExcluirPainel={async (id) => { await excluirPainel(id); recarregarAnotacoes(); }}
         painelSelecionado={currentPainel}
         onPainelUpdated={() => { if (recarregar) recarregar(); }}
         />
