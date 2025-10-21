@@ -53,8 +53,8 @@ export function TarefaSection({
 
   useEffect(() => {
     console.log("e.... começou");
-    const sorted = [...anotacoes].sort((a, b) => b.prioridade - a.prioridade);
-    atualizarAnotacoesFront(sorted);
+    atualizarAnotacoesFront(anotacoes);
+    itemPositionsRef.current.clear();
   }, [anotacoes]);
 
   // Debug logs
@@ -107,7 +107,7 @@ export function TarefaSection({
 
   const moverAnotacao = (id: number, afterId: number | null) => {
     const prev = anotacoesInfoRef.current;
-    const formatarparaString = (novaArray : AnotacaoEntity[]) => novaArray.map((anotacao) => `Descrição ${anotacao.descricao} - id ${anotacao.id} - índice ${novaArray.findIndex(a => a.id === anotacao.id)}`).join(', ');
+    const formatarparaString = (novaArray : AnotacaoEntity[]) => novaArray.map((anotacao) => `Descrição ${anotacao.descricao} - id ${anotacao.id} - índice ${novaArray.findIndex(a => a.id === anotacao.id)} - ordem ${anotacao.ordem}`).join(', ');
 
 
     const from = prev.findIndex(a => a.id === id);
@@ -129,6 +129,7 @@ export function TarefaSection({
     }
     next.splice(insertIndex, 0, item);
 
+    anotacoesInfoRef.current.forEach(a => {a.ordem = next.indexOf(a)});
     console.log(`Agora a array está organizada dessa forma: ${formatarparaString(next)}`);
 
     atualizarAnotacoesFront(next.map((anotacao, i) => ({ ...anotacao, prioridade: i })));
@@ -138,7 +139,6 @@ export function TarefaSection({
             await onUpdateOrdemAnotacao(a.id, new Anotacao(a));
           }
         };
-        
     run();
     
   };
@@ -149,27 +149,31 @@ export function TarefaSection({
     const sorted = new Map([...itemPositionsRef.current.entries()].sort((a, b) => b[1] - a[1]))
     sorted.delete(id);
     const [itemDropado] = anotacoesInfoRef.current.filter(a => a.id === id);
+    const moverParaPrimeiro = () => {
+      console.log(`Não tinha nada em cima do ${itemDropado.descricao}, então ele virou o primeiro da lista}`);
+      moverAnotacao(id, null);
+    };
+    if (0 > adjustedPosition) {moverParaPrimeiro(); return;}
+    let nenhumAcima = true;
     for (const [posId, yPos] of sorted) 
       {
-        if (0 > adjustedPosition)
-        {
-          console.log(`Não tinha nada em cima do ${itemDropado.descricao}, então ele virou o primeiro da lista}`)
-          moverAnotacao(id, null);
-          break;
-        }
         if(yPos < adjustedPosition) 
         {
           console.log(`Posição do item dropado "${itemDropado.descricao}" com o id ${id}: ${adjustedPosition}`);
-          console.log(`anotações do display atual: ${anotacoesInfoRef.current.map(a => `Anotação id ${a.id}, descrição ${a.descricao}`).join(' - ')}`);
+          console.log(`anotações do ref atual: ${anotacoesInfoRef.current.map(a => `Anotação id ${a.id}, descrição ${a.descricao}`).join(' - ')}`);
           console.log(`anotacoes original para efeito de comparação: ${anotacoes.map(a => `Anotação id ${a.id}, descrição ${a.descricao}`).join(' - ')}`);
+          console.log(`Análise sendo feita para anotação de id ${posId}, a primeira abaixo de onde a tarefa foi dropada`);
+          console.log(`Buscando dados para a tarefa com o id ${posId}....`);
           const [itemAcima] = anotacoesInfoRef.current.filter(a => a.id === posId);
           console.log(`Ele estava em baixo de "${itemAcima.descricao}" com o id ${itemAcima.id}`);
           
           console.log('Item acima:', itemAcima.descricao);
           moverAnotacao(id, itemAcima.id);
+          nenhumAcima = false;
           break;
         }
-    };
+      };
+    if(nenhumAcima) moverParaPrimeiro();
   };
 
   const placeHolderFunction = (id) => {};
@@ -254,7 +258,7 @@ export function TarefaSection({
       {loading ? (
         <ActivityIndicator size="small" color="#4630eb" />
       ) : (
-        <ScrollView className="flex-1" style={painelAtual && {borderWidth: 1, borderRadius: 12, padding: 12, backgroundColor: '#f1f1f1', borderColor: painelAtual.cor}}>
+        <ScrollView className="flex-1" style={painelAtual && {borderWidth: 1, borderRadius: 12, padding: 12, backgroundColor: '#f1f1f1', borderColor:painelAtual.cor}}>
           {/* Tarefas Pendentes */}
           {anotacoesDisplay.map((anotacao) => (
             <AnotacaoItem
@@ -276,7 +280,7 @@ export function TarefaSection({
       <CriarTarefaModal
         visible={modalVisible}
         onClose={handleCloseModal}
-        onEditarTarefa={handleEditarTarefa}
+        onEditTarefa={handleEditarTarefa}
         darkMode={darkMode}
         fontSize={fontSize}
         tarefaParaEditar={tarefaParaEditar}
