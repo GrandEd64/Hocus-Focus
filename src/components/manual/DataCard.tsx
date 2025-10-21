@@ -81,7 +81,7 @@ console.log(tarefas);
     return (
         <View>
             <View className="mt-4 mx-6 flex flex-row justify-between items-center">
-                <Text className={textColor} style={{ fontSize: fontSize + 8 }}>
+                <Text className="text-black" style={{ fontSize: fontSize + 8 }}>
                     Atividades ({tarefas.length})
                 </Text>
                 <TouchableOpacity onPress={onAddTarefa}>

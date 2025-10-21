@@ -76,6 +76,10 @@ export function migrateDatabase(db) {
             db.execSync(`ALTER TABLE Anotacao ADD COLUMN prioridade INTEGER DEFAULT 1`);
             console.log('✅ Coluna prioridade adicionada');
         }
+        if (!columnNames.includes('ordem')) {
+            db.execSync(`ALTER TABLE Anotacao ADD COLUMN ordem INTEGER DEFAULT 0`);
+            console.log('✅ Coluna ordem adicionada à tabela Anotacao');
+        }
         
         if (!columnNames.includes('data_vencimento')) {
             db.execSync(`ALTER TABLE Anotacao ADD COLUMN data_vencimento TEXT`);
@@ -115,6 +119,18 @@ export function migrateDatabase(db) {
         }
         
         console.log('✅ Migração de colunas concluída');
+        // Verificar se a tabela Painel tem a coluna 'ordem' (pode faltar em bases antigas)
+        try {
+            const painelInfo = db.getAllSync("PRAGMA table_info(Painel)");
+            const painelCols = painelInfo.map(c => c.name);
+            if (!painelCols.includes('ordem')) {
+                db.execSync(`ALTER TABLE Painel ADD COLUMN ordem INTEGER DEFAULT 0`);
+                console.log('✅ Coluna ordem adicionada à tabela Painel');
+            }
+        } catch (err) {
+            // se a tabela Painel não existir ainda, nada a fazer
+            console.log('⚠️ Verificação da coluna ordem em Painel falhou (tabela ausente?):', err.message);
+        }
     } catch (error) {
         console.error('❌ Erro na migração:', error);
         throw error;
