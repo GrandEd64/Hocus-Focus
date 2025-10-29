@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { View, Text, Animated, PanResponder, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import { AnotacaoEntity } from "../types/entities";
+import { getNotaColor } from "../Nota/getNotaColor";
 
 interface AnotacaoItemProps {
   item: AnotacaoEntity;
@@ -115,6 +116,16 @@ export function AnotacaoItem({
             {descricao}
           </Text>
         </TouchableOpacity>
+
+        {item.nota && (
+          <View 
+            className="w-10 h-10 rounded-full items-center justify-center mr-4"
+            style={{ backgroundColor: getNotaColor(item.nota) }}>
+            <Text className="text-white font-bold" style={{ fontSize: styles.text.fontSize }}>
+              {item.nota.toFixed(1)}
+            </Text>
+          </View>
+        )}
         
         <TouchableOpacity
           onPress={onEdit}

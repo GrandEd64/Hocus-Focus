@@ -133,7 +133,7 @@ export default function NotaCard({
   return (
     <View className="flex-1">
       {/* Header com título e botão de adicionar */}
-      <View className="flex-row justify-between items-center mb-4 px-4">
+      <View className="flex-row justify-between items-center mb-4 mt-2 px-4">
         <View>
           <Text className={`font-bold ${textColor}`} style={{ fontSize: fontSize + 4 }}>
             Notas ({notas.length})

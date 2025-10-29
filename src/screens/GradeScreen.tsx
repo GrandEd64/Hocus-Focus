@@ -174,13 +174,13 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
         Minhas Notas
       </Text>
       
-      {painelNotas.length !== 0 && 
-        (
-          <NotaPainelCard
+      {painelNotas.length > 0 && (
+        <NotaPainelCard
           paineisNotas={painelNotas}
-          />
-        )
-      }
+          darkMode={darkMode}
+          fontSize={fontSize}
+        />
+      )}
 
       <NotaCard
         notas={notas}

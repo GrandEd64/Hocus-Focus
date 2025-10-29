@@ -56,7 +56,7 @@ export default function NotaPainelCard({
   const renderPainel = ({ item }: { item : PainelNotas;}) => {
     const renderNota = ({item} : {item : AnotacaoEntity;}) => {const notaColor = getNotaColor(item.nota); return(
       <TouchableOpacity
-        className={`flex-row items-center p-3 mb-2 rounded-lg border ${cardBg} ${borderColor}`}
+        className={`flex-row items-center p-3 rounded-lg border ${cardBg} ${borderColor}`}
         onPress={() => onAnotacaoPress?.(item)}
         activeOpacity={0.7}
       >
@@ -108,12 +108,26 @@ export default function NotaPainelCard({
     )};
 
     return (
-    <FlatList
-    style={{backgroundColor: '#f1f1f1', borderBlockColor:item.Painel.cor}}
-    data={item.Anotacoes}
-    keyExtractor={item => String(item.id)}
-    renderItem={renderNota}
-    />)
+      <View className="mt-2">
+        <Text className={`font-semibold ${textColor} mb-2`} style={{ fontSize }}>
+          {item.Painel.nome}
+        </Text>
+        <FlatList
+          className={`rounded-lg ${cardBg}`}
+          style={{ 
+            borderLeftWidth: 4, 
+            borderLeftColor: item.Painel.cor, 
+            gap: 5, 
+            paddingTop: 5, 
+            paddingBottom: 5,
+            paddingRight: 5
+          }}
+          data={item.Anotacoes}
+          keyExtractor={item => String(item.id)}
+          renderItem={renderNota}
+        />
+      </View>
+    )
   };
 
   return (
@@ -122,7 +136,7 @@ export default function NotaPainelCard({
       <View className="flex-row justify-between items-center mb-4 px-4">
         <View>
           <Text className={`font-bold ${textColor}`} style={{ fontSize: fontSize + 4 }}>
-            Notas (de paineis) ({paineisNotas.length})
+            Notas de paineis ({(paineisNotas.flatMap(a => a.Anotacoes).length)})
           </Text>
           {paineisNotas.length > 0 && (
             <Text className={secondaryTextColor} style={{ fontSize: fontSize - 2 }}>
@@ -141,7 +155,7 @@ export default function NotaPainelCard({
             keyExtractor={item => String(item.Painel.id)}
             renderItem={renderPainel}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            className='rounded-lg'
           />
         )}
       </View>
