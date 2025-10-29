@@ -191,7 +191,7 @@ export function TarefaSection({
     }
   };
 
-  const handleDoublePress = (tarefa: AnotacaoEntity) => {
+  const handleEditTarefa = (tarefa: AnotacaoEntity) => {
     console.log('handleDoublePress chamado para tarefa:', tarefa.descricao);
     setTarefaParaEditar(tarefa);
     setModalVisible(true);
@@ -199,11 +199,13 @@ export function TarefaSection({
 
   const handleEditarTarefa = async (dadosTarefa: any) => {
     try {
+      console.log('Novos dados de tarefa para editar:', JSON.stringify(dadosTarefa, null, 2));
       // Editar tarefa existente
       const anotacaoAtualizada = new Anotacao({
         ...tarefaParaEditar,
         descricao: dadosTarefa.descricao,
         prioridade: dadosTarefa.prioridade,
+        nota: dadosTarefa.nota,
         data_vencimento: dadosTarefa.data_vencimento,
         painel_id: dadosTarefa.painel_id
       });
@@ -268,7 +270,7 @@ export function TarefaSection({
               todasTarefas={anotacoesDisplay}
               onPress={() => handleMarcarConcluida(anotacao.id)}
               onLongPress={() => handleExcluirAnotacao(anotacao.id)}
-              onEdit={() => handleDoublePress(anotacao)}
+              onEdit={() => handleEditTarefa(anotacao)}
               onDropAnotacao={(newY) => handleDropAnotacao(anotacao.id, newY)}
               darkMode={darkMode}
             />

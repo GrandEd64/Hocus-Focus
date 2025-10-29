@@ -11,6 +11,7 @@ type CriarTarefaModalProps = {
   onEditTarefa: (tarefa: {
     descricao: string;
     prioridade: number;
+    nota: string;
     data_vencimento?: string;
     painel_id?: number;
   }) => void;
@@ -33,6 +34,7 @@ export default function CriarTarefaModal({
 }: CriarTarefaModalProps) {
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState(1);
+  const [nota, setNota] = useState('');
   const [dataVencimento, setDataVencimento] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [painel, setPainel] = useState(null);
@@ -41,8 +43,10 @@ export default function CriarTarefaModal({
   // Preencher campos quando estiver editando
   React.useEffect(() => {
     if (tarefaParaEditar) {
+      console.log('Nota value:', tarefaParaEditar.nota);
       setDescricao(tarefaParaEditar.descricao || '');
       setPrioridade(tarefaParaEditar.prioridade || 1);
+      setNota(tarefaParaEditar.nota?.toString() || '');
       const vencimento = tarefaParaEditar.data_vencimento?.slice(0, 10) || '';
       setDataVencimento(vencimento);
       if (vencimento) {
@@ -54,6 +58,7 @@ export default function CriarTarefaModal({
       // Limpar campos quando for criar nova tarefa
       setDescricao('');
       setPrioridade(1);
+      setNota(null);
       setDataVencimento('');
       setSelectedDate(new Date());
     }
@@ -74,6 +79,7 @@ export default function CriarTarefaModal({
     onEditTarefa({
       descricao: descricao.trim(),
       prioridade,
+      nota,
       data_vencimento: dataVencimento || undefined,
       painel_id: painel
     });
@@ -81,6 +87,7 @@ export default function CriarTarefaModal({
     // Limpar campos
     setDescricao('');
     setPrioridade(1);
+    setNota(null);
     setDataVencimento('');
     setSelectedDate(new Date());
     setShowDatePicker(false);
@@ -158,6 +165,22 @@ export default function CriarTarefaModal({
               multiline
               numberOfLines={3}
             />
+          </View>
+
+          {/* Nota */}
+          <View className='mb-4'>
+            <Text className={`mb-2 font-medium ${textColor}`} style={{ fontSize }}>
+              Nota
+            </Text>
+            <TextInput
+            className={`rounded-lg px-4 py-3 ${cardBg} ${textColor}`}
+            placeholder="Ex: 8.5"
+            placeholderTextColor={placeholderColor}
+            value={nota}
+            onChangeText={setNota}
+            keyboardType="numeric"
+            style={{ fontSize }}
+          />
           </View>
 
           {/* Prioridade */}

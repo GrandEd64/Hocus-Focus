@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, TextInput, Alert, Modal } from "react-nat
 import { useDatabase } from "../hooks/useDatabase";
 import { Nota } from "../database/models/Nota";
 import NotaCard from "../components/manual/NotaCard";
+import { PaineisComNotas } from "../Painel/EncontrarPaineisNotas";
+import NotaPainelCard from "../components/manual/NotaPainelCard";
+import { PainelNotas } from "../Painel/PainelNotas";
 
 type GradeScreenProps = {
   darkMode: boolean;
@@ -13,6 +16,7 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
   const { isReady, services } = useDatabase();
   const [notas, setNotas] = useState([]);
   const [nota, setNota] = useState("");
+  const [painelNotas, setPainelNotas] = useState([] as PainelNotas[]);
   const [materia, setMateria] = useState("");
   const [descricao, setDescricao] = useState("");
   const [editId, setEditId] = useState(null);
@@ -39,6 +43,13 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
       console.log('📚 Notas encontradas:', result);
       console.log('📚 Quantidade de notas:', result.length);
       setNotas(result);
+      console.log('Paineis normais verificados');
+
+      const aResult = await PaineisComNotas(services);
+      console.log(aResult);
+      console.log('📚 Paineis com notas encontrados:', aResult.length);
+      console.log('📚 Quantidade de notas nos paineis:', aResult.map(p => p.Anotacoes).length);
+      setPainelNotas(aResult as PainelNotas[]);
     } catch (error) {
       console.error('❌ Erro ao carregar notas:', error);
     }
@@ -163,6 +174,14 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
         Minhas Notas
       </Text>
       
+      {painelNotas.length !== 0 && 
+        (
+          <NotaPainelCard
+          paineisNotas={painelNotas}
+          />
+        )
+      }
+
       <NotaCard
         notas={notas}
         onAddNota={abrirModalNova}
@@ -244,7 +263,7 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
               />
             </View>
 
-            {/* <View className="flex-row justify-end space-x-3">
+            <View className="flex-row justify-end space-x-3">
               <TouchableOpacity
                 className={`px-6 py-3 rounded-lg ${cardBg}`}
                 onPress={fecharModal}
@@ -261,7 +280,7 @@ export function GradeScreen({ darkMode, fontSize }: GradeScreenProps) {
                   {editId ? 'Salvar Alterações' : 'Adicionar Nota'}
                 </Text>
               </TouchableOpacity>
-            </View> */}
+            </View>
           </View>
         </View>
       </Modal>

@@ -17,6 +17,7 @@ export interface AnotacaoEntity {
   data_envio: string;
   data_vencimento?: string;
   ordem?: number;
+  nota?: number;
   painel_id?: number;
   data_criacao?: string;
   data_atualizacao?: string;

@@ -26,6 +26,7 @@ export function createTables(db) {
                 data_vencimento TEXT,
                 ordem INTEGER NOT NULL,
                 painel_id INTEGER,
+                nota INTEGER DEFAULT NULL,
                 data_criacao TEXT DEFAULT CURRENT_TIMESTAMP,
                 data_atualizacao TEXT DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(painel_id) REFERENCES Painel(id)
@@ -75,6 +76,10 @@ export function migrateDatabase(db) {
         if (!columnNames.includes('prioridade')) {
             db.execSync(`ALTER TABLE Anotacao ADD COLUMN prioridade INTEGER DEFAULT 1`);
             console.log('✅ Coluna prioridade adicionada');
+        }
+        if (!columnNames.includes('nota')) {
+            db.execSync(`ALTER TABLE Anotacao ADD COLUMN nota INTEGER DEFAULT NULL`);
+            console.log('✅ Coluna nota adicionada');
         }
         if (!columnNames.includes('ordem')) {
             db.execSync(`ALTER TABLE Anotacao ADD COLUMN ordem INTEGER DEFAULT 0`);

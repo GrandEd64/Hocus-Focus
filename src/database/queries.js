@@ -114,9 +114,9 @@ export class AnotacaoDAO extends BaseDAO {
     const data = anotacao.toDatabase();
 
     return await db.runAsync(
-      `UPDATE Anotacao SET descricao = ?, concluido = ?, prioridade = ?, data_envio = ?, 
+      `UPDATE Anotacao SET descricao = ?, concluido = ?, prioridade = ?, nota = ?, data_envio = ?, 
        data_vencimento = ?, painel_id = ?, data_atualizacao = ?, ordem = ? WHERE id = ?`,
-      [data.descricao, data.concluido, data.prioridade, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao, data.ordem, id]
+      [data.descricao, data.concluido, data.prioridade, data.nota, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao, data.ordem, id]
     );
   }
 

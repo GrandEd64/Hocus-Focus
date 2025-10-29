@@ -6,15 +6,17 @@ import { Anotacao } from '../../database/models';
 import { AnotacaoEntity, PainelEntity } from '../../types/entities';
 
 type NotaPainelCardProps = {
-  paineisNotas?: PainelNotas[];
+  paineisNotas: PainelNotas[];
   darkMode?: boolean;
   fontSize?: number;
+  onAnotacaoPress? : (anot : AnotacaoEntity) => void;
 };
 
-export default function NotaCard({ 
+export default function NotaPainelCard({ 
   paineisNotas, 
   darkMode = true, 
   fontSize = 16,
+  onAnotacaoPress
 }: NotaPainelCardProps) {
   // Cores baseadas no tema
   const textColor = darkMode ? "text-white" : "text-black";
@@ -51,13 +53,11 @@ export default function NotaCard({
     });
   };
 
-  const renderPainel = ({ ap }: { ap : PainelNotas;}) => {
-    const notaColor = getNotaColor(a.nota);
-    const renderNota = ({item} : {item : AnotacaoEntity;}) => (
+  const renderPainel = ({ item }: { item : PainelNotas;}) => {
+    const renderNota = ({item} : {item : AnotacaoEntity;}) => {const notaColor = getNotaColor(item.nota); return(
       <TouchableOpacity
         className={`flex-row items-center p-3 mb-2 rounded-lg border ${cardBg} ${borderColor}`}
-        onPress={() => onNotaPress?.(item)}
-        onLongPress={() => onNotaLongPress?.(item)}
+        onPress={() => onAnotacaoPress?.(item)}
         activeOpacity={0.7}
       >
         {/* Nota com cor */}
@@ -73,17 +73,8 @@ export default function NotaCard({
         {/* Conteúdo da nota */}
         <View className="flex-1">
           <Text className={`font-semibold ${textColor}`} style={{ fontSize }}>
-            {p.nome}
+            {item.descricao}
           </Text>
-          {a.descricao && (
-            <Text 
-              className={secondaryTextColor} 
-              style={{ fontSize: fontSize - 2 }}
-              numberOfLines={2}
-            >
-              {a.descricao}
-            </Text>
-          )}
           <View className="flex-row items-center mt-1">
             <MaterialIcons 
               name="schedule" 
@@ -94,7 +85,7 @@ export default function NotaCard({
               className={secondaryTextColor} 
               style={{ fontSize: fontSize - 4, marginLeft: 4 }}
             >
-              {formatarData(a.data_criacao)}
+              {formatarData(item.data_criacao)}
             </Text>
           </View>
         </View>
@@ -109,16 +100,17 @@ export default function NotaCard({
               style={{ color: notaColor, fontSize: fontSize - 4 }}
               className="font-medium"
             >
-              {getNotaLabel(a.nota)}
+              {getNotaLabel(item.nota)}
             </Text>
           </View>
         </View>
       </TouchableOpacity>
-    );
+    )};
 
     return (
     <FlatList
-    data={ap.Anotacoes}
+    style={{backgroundColor: '#f1f1f1', borderBlockColor:item.Painel.cor}}
+    data={item.Anotacoes}
     keyExtractor={item => String(item.id)}
     renderItem={renderNota}
     />)
@@ -145,9 +137,9 @@ export default function NotaCard({
       <View className="flex-1 px-4">
         {paineisNotas.length > 0 && (
           <FlatList
-            data={notas}
-            keyExtractor={item => String(item.id)}
-            renderItem={renderNota}
+            data={paineisNotas}
+            keyExtractor={item => String(item.Painel.id)}
+            renderItem={renderPainel}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
           />
