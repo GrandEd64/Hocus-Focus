@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Dimensions } from "react-native";
+import { View, Text, ScrollView, Dimensions, Alert } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
-import { useDatabase, useAnotacoes } from "../hooks/useDatabase";
+import { useDatabase, useAnotacoes, usePaineis } from "../hooks/useDatabase";
 import DataCard from "../components/manual/DataCard";
 import CalendarioSemanal from "../components/CalendarioSemanal";
-
-/*a ideia é que ele seja um agrupamento, consegue enxergar no calendario 
-os paineis que voce fez de acordo com a data*/
+import CriarTarefaModal from "../components/manual/EditarTarefaModal";
+import { Anotacao } from '../database/models'; // ✅ Importar a classe Anotacao
 // Configuração de idioma para o calendário
 LocaleConfig.locales["pt-br"] = {
   monthNames: [
@@ -61,27 +60,27 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
   const [markedDates, setMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState("");
   const [painelPorData, setPainelPorData] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tarefaEditando, setTarefaEditando] = useState(null);
+  const { paineis, loading: loadingPaineis, criarPainel, excluirPainel, recarregar } = usePaineis();
   
-  // Hook para pegar todas as anotações
-  const { anotacoes, loading: loadingAnotacoes } = useAnotacoes();
+  // ✅ Obter as funções do hook useAnotacoes
+  const { anotacoes, loading: loadingAnotacoes, atualizarAnotacao, excluirAnotacao } = useAnotacoes();
 
   useEffect(() => {
     async function fetchAtividades() {
       if (!isReady || !services || loadingAnotacoes) return;
       
-      // Agrupa atividades por data de vencimento
       const marks = {};
       const atividadeDataMap = {};
       
       anotacoes.forEach((anotacao) => {
         const date = anotacao.data_vencimento?.slice(0, 10);
         if (date) {
-          // Define cor da bolinha baseada na prioridade
-          let dotColor = "#10b981"; // verde para baixa prioridade
-          if (anotacao.prioridade >= 3) dotColor = "#ef4444"; // vermelho para alta
-          else if (anotacao.prioridade >= 2) dotColor = "#f59e0b"; // amarelo para média
+          let dotColor = "#10b981";
+          if (anotacao.prioridade >= 3) dotColor = "#ef4444";
+          else if (anotacao.prioridade >= 2) dotColor = "#f59e0b";
           
-          // Se já existe uma data, usa a cor da prioridade mais alta
           if (marks[date]) {
             const currentColor = marks[date].dotColor;
             if (currentColor === "#10b981" && (dotColor === "#f59e0b" || dotColor === "#ef4444")) {
@@ -106,6 +105,74 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
     }
     fetchAtividades();
   }, [isReady, services, anotacoes, loadingAnotacoes]);
+
+  // ✅ FUNÇÃO PARA ABRIR EDIÇÃO
+  const handleEditTarefa = (tarefa) => {
+    console.log('Editando tarefa no calendário:', tarefa.descricao);
+    setTarefaEditando(tarefa);
+    setModalVisible(true);
+  };
+
+  // ✅ FUNÇÃO PARA SALVAR EDIÇÃO - IDÊNTICA AO handleEditarTarefa QUE FUNCIONA
+  const handleSalvarEdicao = async (dadosTarefa: any) => {
+    try {
+      console.log('Novos dados de tarefa para editar:', JSON.stringify(dadosTarefa, null, 2));
+      
+      if (!tarefaEditando) {
+        Alert.alert('Erro', 'Nenhuma tarefa selecionada para edição.');
+        return;
+      }
+
+      // ✅ EXATAMENTE IGUAL AO handleEditarTarefa QUE FUNCIONA
+      const anotacaoAtualizada = new Anotacao({
+        ...tarefaEditando,
+        descricao: dadosTarefa.descricao,
+        prioridade: dadosTarefa.prioridade,
+        nota: dadosTarefa.nota,
+        data_vencimento: dadosTarefa.data_vencimento,
+        painel_id: dadosTarefa.painel_id
+      });
+
+      console.log('AnotacaoAtualizada criada:', anotacaoAtualizada);
+        
+      // ✅ USAR A FUNÇÃO DO HOOK useAnotacoes (igual ao TarefaSection)
+      await atualizarAnotacao(tarefaEditando.id, anotacaoAtualizada);
+      
+      setModalVisible(false);
+      setTarefaEditando(null);
+      
+      Alert.alert('Sucesso', 'Tarefa atualizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao editar tarefa:', error);
+      Alert.alert('Erro', 'Não foi possível salvar a tarefa');
+    }
+  };
+
+  // ✅ FUNÇÃO PARA DELETAR TAREFA
+  const handleDeleteTarefa = async (tarefa: Anotacao) => {
+    try {
+      await excluirAnotacao(tarefa.id);
+      Alert.alert('Sucesso', 'Tarefa deletada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao deletar tarefa:', error);
+      Alert.alert('Erro', 'Não foi possível deletar a tarefa');
+    }
+  };
+
+  const handleFecharModal = () => {
+    setModalVisible(false);
+    setTarefaEditando(null);
+  };
+
+  const handleAddTarefa = () => {
+    Alert.alert('Ação', 'Adicionar nova tarefa - implemente esta função');
+  };
+
+  const handleTarefaPress = (tarefa) => {
+    console.log('Tarefa pressionada (ação normal):', tarefa.descricao);
+    // Você pode adicionar outras ações aqui se quiser
+    // Por exemplo: marcar como concluída, abrir detalhes, etc.
+  };
 
   const textColor = darkMode ? "text-white" : "text-black";
   const bgColor = darkMode ? "bg-neutral-900" : "bg-white";
@@ -216,6 +283,30 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
             onAddTarefa={() => console.log('Adicionar')}
             onTarefaPress={(tarefa) => console.log('Tarefa:', tarefa)}
           />
+
+          {/* ✅ DATACARD CONECTADO COM TODAS AS FUNÇÕES */}
+      {isReady && services && (
+        <DataCard 
+          tarefas={anotacoes} 
+          onAddTarefa={handleAddTarefa}
+          onTarefaPress={handleTarefaPress}
+          onEditTarefa={handleEditTarefa}
+          onDeleteTarefa={handleDeleteTarefa} // ✅ DELETAR VIA PRESSÃO LONGA
+          darkMode={darkMode}
+          fontSize={fontSize}
+        />
+      )}
+
+        {/* ✅ MODAL DE EDIÇÃO */}
+        <CriarTarefaModal
+          visible={modalVisible}
+          onClose={handleFecharModal}
+          onEditTarefa={handleSalvarEdicao}
+          darkMode={darkMode}
+          fontSize={fontSize}
+          tarefaParaEditar={tarefaEditando}
+          paineis={paineis} // Passe sua lista de paineis aqui se tiver
+        />
         </View>
       </View>
       <View style={{width: Dimensions.get('window').width}}>
