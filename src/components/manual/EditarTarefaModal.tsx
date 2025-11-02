@@ -22,7 +22,7 @@ type CriarTarefaModalProps = {
   paineis?: PainelEntity[];
 };
 
-export default function CriarTarefaModal({
+export default function EditarTarefaModal({
   visible,
   onClose,
   onEditTarefa,

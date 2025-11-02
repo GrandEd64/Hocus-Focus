@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { AnotacaoEntity, PainelEntity } from '../types/entities';
 import { AnotacaoItem } from './AnotacaoItem';
-import CriarTarefaModal from './manual/EditarTarefaModal';
+import EditarTarefaModal from './manual/EditarTarefaModal';
 import "../../global.css"
 import { Anotacao } from '../database/models';
 
@@ -279,7 +279,7 @@ export function TarefaSection({
       )}
 
       {/* Modal para criar/editar tarefa */}
-      <CriarTarefaModal
+      <EditarTarefaModal
         visible={modalVisible}
         onClose={handleCloseModal}
         onEditTarefa={handleEditarTarefa}

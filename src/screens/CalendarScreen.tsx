@@ -4,7 +4,7 @@ import { Calendar, LocaleConfig } from "react-native-calendars";
 import { useDatabase, useAnotacoes, usePaineis } from "../hooks/useDatabase";
 import DataCard from "../components/manual/DataCard";
 import CalendarioSemanal from "../components/CalendarioSemanal";
-import CriarTarefaModal from "../components/manual/EditarTarefaModal";
+import EditarTarefaModal from "../components/manual/EditarTarefaModal";
 import { Anotacao } from '../database/models'; // ✅ Importar a classe Anotacao
 // Configuração de idioma para o calendário
 LocaleConfig.locales["pt-br"] = {
@@ -278,27 +278,21 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
               })}
             </View>
           )}
-          <DataCard 
-            tarefas={anotacoes} 
-            onAddTarefa={() => console.log('Adicionar')}
-            onTarefaPress={(tarefa) => console.log('Tarefa:', tarefa)}
-          />
-
           {/* ✅ DATACARD CONECTADO COM TODAS AS FUNÇÕES */}
       {isReady && services && (
-        <DataCard 
-          tarefas={anotacoes} 
-          onAddTarefa={handleAddTarefa}
-          onTarefaPress={handleTarefaPress}
-          onEditTarefa={handleEditTarefa}
-          onDeleteTarefa={handleDeleteTarefa} // ✅ DELETAR VIA PRESSÃO LONGA
-          darkMode={darkMode}
-          fontSize={fontSize}
-        />
+          <DataCard 
+            tarefas={anotacoes} 
+            onAddTarefa={handleAddTarefa}
+            onTarefaPress={handleTarefaPress}
+            onEditTarefa={handleEditTarefa}
+            onDeleteTarefa={handleDeleteTarefa} // ✅ DELETAR VIA PRESSÃO LONGA
+            darkMode={darkMode}
+            fontSize={fontSize}
+          />
       )}
 
         {/* ✅ MODAL DE EDIÇÃO */}
-        <CriarTarefaModal
+        <EditarTarefaModal
           visible={modalVisible}
           onClose={handleFecharModal}
           onEditTarefa={handleSalvarEdicao}

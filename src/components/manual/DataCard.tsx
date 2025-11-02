@@ -116,7 +116,7 @@ export default function DataCard({
   };
 
   return (
-    <View>
+    <View className='flex-1'>
       <View className="mt-4 mx-6 flex flex-row justify-between items-center">
         <Text className="text-black" style={{ fontSize: fontSize + 8 }}>
           Atividades ({tarefas.length})
@@ -131,7 +131,8 @@ export default function DataCard({
           data={tarefas}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderTarefa}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{paddingBottom:12}}
         />
       ) : (
         <View className="flex items-center justify-center mx-6 mt-8 p-8">
