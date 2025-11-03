@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { PainelEntity } from '../../types/entities';
 import { Picker } from '@react-native-picker/picker';
 
-type CriarTarefaModalProps = {
+type EditarTarefaModalProps = {
   visible: boolean;
   onClose: () => void;
   onEditTarefa: (tarefa: {
@@ -31,7 +31,7 @@ export default function EditarTarefaModal({
   painelId,
   tarefaParaEditar,
   paineis
-}: CriarTarefaModalProps) {
+}: EditarTarefaModalProps) {
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState(1);
   const [nota, setNota] = useState('');

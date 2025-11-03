@@ -17,6 +17,7 @@ type DataCardProps = {
   onDeleteTarefa?: (tarefa: Tarefa) => void; // ✅ NOVA PROP PARA DELETAR
   darkMode?: boolean;
   fontSize?: number;
+  diaSelecionado?: string;
 };
 
 export default function DataCard({ 
@@ -26,7 +27,8 @@ export default function DataCard({
   onEditTarefa,
   onDeleteTarefa, // ✅ NOVA PROP
   darkMode = true, 
-  fontSize = 16 
+  fontSize = 16,
+  diaSelecionado
 }: DataCardProps) {
   // Cores baseadas no tema
   const textColor = darkMode ? "text-white" : "text-black";
@@ -121,9 +123,9 @@ export default function DataCard({
         <Text className="text-black" style={{ fontSize: fontSize + 8 }}>
           Atividades ({tarefas.length})
         </Text>
-        <TouchableOpacity onPress={onAddTarefa}>
+        {diaSelecionado && (<TouchableOpacity onPress={onAddTarefa}>
           <AntDesign name="plus" size={24} color={darkMode ? "#60a5fa" : "#2563eb"} />
-        </TouchableOpacity>
+        </TouchableOpacity>)}
       </View>
       
       {tarefas.length > 0 ? (

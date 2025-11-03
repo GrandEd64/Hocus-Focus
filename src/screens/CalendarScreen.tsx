@@ -6,6 +6,7 @@ import DataCard from "../components/manual/DataCard";
 import CalendarioSemanal from "../components/CalendarioSemanal";
 import EditarTarefaModal from "../components/manual/EditarTarefaModal";
 import { Anotacao } from '../database/models'; // ✅ Importar a classe Anotacao
+import CriarTarefaModal from "../components/manual/CriarTarefaModal";
 // Configuração de idioma para o calendário
 LocaleConfig.locales["pt-br"] = {
   monthNames: [
@@ -61,11 +62,12 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
   const [selectedDate, setSelectedDate] = useState("");
   const [painelPorData, setPainelPorData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalActive, setModalActive] = useState(null);
   const [tarefaEditando, setTarefaEditando] = useState(null);
   const { paineis, loading: loadingPaineis, criarPainel, excluirPainel, recarregar } = usePaineis();
   
   // ✅ Obter as funções do hook useAnotacoes
-  const { anotacoes, loading: loadingAnotacoes, atualizarAnotacao, excluirAnotacao } = useAnotacoes();
+  const { anotacoes, loading: loadingAnotacoes, atualizarAnotacao, excluirAnotacao, criarAnotacao } = useAnotacoes();
 
   useEffect(() => {
     async function fetchAtividades() {
@@ -111,6 +113,7 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
     console.log('Editando tarefa no calendário:', tarefa.descricao);
     setTarefaEditando(tarefa);
     setModalVisible(true);
+    setModalActive(0);
   };
 
   // ✅ FUNÇÃO PARA SALVAR EDIÇÃO - IDÊNTICA AO handleEditarTarefa QUE FUNCIONA
@@ -139,6 +142,7 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
       await atualizarAnotacao(tarefaEditando.id, anotacaoAtualizada);
       
       setModalVisible(false);
+      setModalActive(null);
       setTarefaEditando(null);
       
       Alert.alert('Sucesso', 'Tarefa atualizada com sucesso!');
@@ -161,11 +165,18 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
 
   const handleFecharModal = () => {
     setModalVisible(false);
+    setModalActive(null);
     setTarefaEditando(null);
   };
 
   const handleAddTarefa = () => {
-    Alert.alert('Ação', 'Adicionar nova tarefa - implemente esta função');
+    setModalVisible(true);
+    setModalActive(1);
+  };
+
+  const dataSelecionadaFormatada = () => {
+    const [ano, mes, dia] = selectedDate.split('-').map(Number);
+    return new Date(ano, mes - 1, dia);
   };
 
   const handleTarefaPress = (tarefa) => {
@@ -288,18 +299,33 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
             onDeleteTarefa={handleDeleteTarefa} // ✅ DELETAR VIA PRESSÃO LONGA
             darkMode={darkMode}
             fontSize={fontSize}
+            diaSelecionado={selectedDate}
           />
       )}
 
         {/* ✅ MODAL DE EDIÇÃO */}
         <EditarTarefaModal
-          visible={modalVisible}
+          visible={modalVisible && modalActive === 0}
           onClose={handleFecharModal}
           onEditTarefa={handleSalvarEdicao}
           darkMode={darkMode}
           fontSize={fontSize}
           tarefaParaEditar={tarefaEditando}
           paineis={paineis} // Passe sua lista de paineis aqui se tiver
+        />
+
+        <CriarTarefaModal
+          visible={modalVisible && modalActive === 1}
+          onClose={(handleFecharModal)}
+          onCreate={async (d, p) => {await criarAnotacao(
+            new Anotacao({
+              descricao: d, 
+              data_vencimento: dataSelecionadaFormatada().toISOString().split('T')[0],
+              prioridade: p
+            })); 
+            handleFecharModal();}}
+          fontSize={fontSize}
+          dia={dataSelecionadaFormatada() || new Date()}
         />
         </View>
       </View>
