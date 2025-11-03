@@ -107,10 +107,13 @@ export default function NotaPainelCard({
       </TouchableOpacity>
     )};
 
+    const soma = item.Anotacoes.reduce((acc, anot) => acc + anot.nota, 0);
+    const mediaPainel = (soma / item.Anotacoes.length).toFixed(1);
     return (
+
       <View className="mt-2">
         <Text className={`font-semibold ${textColor} mb-2`} style={{ fontSize }}>
-          {item.Painel.nome}
+          {item.Painel.nome} (média: {mediaPainel})
         </Text>
         <FlatList
           className={`rounded-lg ${cardBg}`}
