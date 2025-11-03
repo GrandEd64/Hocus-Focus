@@ -55,13 +55,13 @@ export default function CalendarioSemanal ({
 
         const anotsDessaSemana: anotacaoComDataParserizada[] = anotsParserized.filter(a => a.data >= normalizeDate(startDate) && a.data <= normalizeDate(endDate));
         const diasDaSemanaComAtividades: Date[] = Array.from(new Set(anotsDessaSemana.map(a => a.data.getTime()))).map(t => new Date(t));
-        
+
         setAtividadesDaSemana(
             diasDaSemanaComAtividades.map(d => ({
                 dia: d, 
                 atividades: 
                     anotsDessaSemana.filter(an => an.data.getTime() === d.getTime()).map(an => an.anotacao)
-                }))
+                })).sort((a, b) => a.dia.getTime() - b.dia.getTime())
         );
     };
 
@@ -117,7 +117,7 @@ export default function CalendarioSemanal ({
         )
     };
 
-    const formatarData = (data : Date) => {return `${data.getDate().toString().padStart(2, '0')}/${data.getMonth().toString().padStart(2, '0')}`};
+    const formatarData = (data : Date) => {return `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`};
     return (
         <View className="bg-white flex-1 pt-10">
             <Text className="font-bold text-center mb-6" style={{fontSize: fontSize + 4}}>
