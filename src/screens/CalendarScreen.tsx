@@ -132,6 +132,7 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
         descricao: dadosTarefa.descricao,
         prioridade: dadosTarefa.prioridade,
         nota: dadosTarefa.nota,
+        tempo_planejado_estudo: dadosTarefa.tempo_planejado_estudo,
         data_vencimento: dadosTarefa.data_vencimento,
         painel_id: dadosTarefa.painel_id
       });
@@ -333,6 +334,7 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
         <CalendarioSemanal
         fontSize={fontSize}
         services={services}
+        servicesIsReady={isReady}
         onAnotacaoTouched={() => {}}/>
       </View>
     </ScrollView>

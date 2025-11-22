@@ -20,12 +20,14 @@ type anotacaoComDataParserizada = {
 interface CalendarioSemanalProps {
     fontSize?: number;
     services;
+    servicesIsReady;
     onAnotacaoTouched?: (anotacao : AnotacaoEntity) => void;
 }
 
 export default function CalendarioSemanal ({
     fontSize,
     services,
+    servicesIsReady,
     onAnotacaoTouched
 } : CalendarioSemanalProps) 
 {
@@ -65,11 +67,13 @@ export default function CalendarioSemanal ({
         );
     };
 
+    useEffect(() => {loadAnotacoesDaSemana();}, [servicesIsReady]);
+
     useEffect(() => {
         if (!services?.anotacao) {console.log("Banco de dados não está pronto."); return}
 
         loadAnotacoesDaSemana();
-    }, [services]);
+    }, [])
 
     const renderAnotacao = ({ item }: { item: AnotacaoEntity }) => {
         const prioridadeColor = item.prioridade >= 3 ? "#ef4444" : 

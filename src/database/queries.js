@@ -115,8 +115,8 @@ export class AnotacaoDAO extends BaseDAO {
 
     return await db.runAsync(
       `UPDATE Anotacao SET descricao = ?, concluido = ?, prioridade = ?, nota = ?, data_envio = ?, 
-       data_vencimento = ?, painel_id = ?, data_atualizacao = ?, ordem = ? WHERE id = ?`,
-      [data.descricao, data.concluido, data.prioridade, data.nota, data.data_envio, data.data_vencimento, data.painel_id, data.data_atualizacao, data.ordem, id]
+       tempo_estudado = ?, tempo_planejado_estudo = ?, data_vencimento = ?, painel_id = ?, data_atualizacao = ?, ordem = ? WHERE id = ?`,
+      [data.descricao, data.concluido, data.prioridade, data.nota, data.data_envio, data.tempo_estudado, data.tempo_planejado_estudo, data.data_vencimento, data.painel_id, data.data_atualizacao, data.ordem, id]
     );
   }
 

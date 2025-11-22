@@ -8,6 +8,8 @@ import { HomeScreen } from "./src/screens/HomeScreen";
 import { CalendarScreen } from "./src/screens/CalendarScreen";
 import { GradeScreen } from "./src/screens/GradeScreen";
 import { ConfigScreen } from "./src/screens/ConfigScreen";
+import TimerScreen from "./src/screens/TimerScreen";
+
 
 export default function App() {
   const { isReady, error } = useDatabase();
@@ -53,13 +55,20 @@ export default function App() {
     );
   else if (activeTab === 3)
     ScreenComponent = () => (
+      <TimerScreen 
+        fontSize={fontSize}
+      />
+  );
+  else if (activeTab === 4)
+    ScreenComponent = () => (
       <ConfigScreen
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         fontSize={fontSize}
         setFontSize={setFontSize}
       />
-    );
+  );
+
   else ScreenComponent = HomeScreen;
 
   return (

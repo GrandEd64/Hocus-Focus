@@ -13,10 +13,11 @@ const icons = [
   <MaterialIcons name="home" size={24} />, // Home
   <MaterialIcons name="calendar-today" size={24} />, // Calendário
   <FontAwesome5 name="chart-bar" size={22} />, // Gráfico
-  <Feather name="settings" size={24} /> // Engrenagem
+  <FontAwesome5 name="clock" size={23} />, //Relógio 
+  <Feather name="settings" size={24} />, // Engrenagem
 ];
 
-const labels = ["Home", "Calendário", "Notas", "Config"];
+const labels = ["Home", "Calendário", "Notas", "Relógio", "Config"];
 
 const TabBar: React.FC<TabBarProps> = ({ activeIndex, onTabPress, darkMode = true }) => {
   // Animated values for each tab

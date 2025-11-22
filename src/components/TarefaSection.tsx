@@ -206,6 +206,7 @@ export function TarefaSection({
         descricao: dadosTarefa.descricao,
         prioridade: dadosTarefa.prioridade,
         nota: dadosTarefa.nota,
+        tempo_planejado_estudo: dadosTarefa.tempo_planejado_estudo,
         data_vencimento: dadosTarefa.data_vencimento,
         painel_id: dadosTarefa.painel_id
       });

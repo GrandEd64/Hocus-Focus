@@ -15,6 +15,8 @@ export interface AnotacaoEntity {
   concluido: number;
   prioridade?: number;
   data_envio: string;
+  tempo_estudado?: string;
+  tempo_planejado_estudo?: string;
   data_vencimento?: string;
   ordem?: number;
   nota?: number;

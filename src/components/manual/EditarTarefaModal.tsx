@@ -4,6 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { PainelEntity } from '../../types/entities';
 import { Picker } from '@react-native-picker/picker';
+import { TimerPickerModal } from 'react-native-timer-picker';
 
 type EditarTarefaModalProps = {
   visible: boolean;
@@ -12,6 +13,7 @@ type EditarTarefaModalProps = {
     descricao: string;
     prioridade: number;
     nota: string;
+    tempo_planejado_estudo: string;
     data_vencimento?: string;
     painel_id?: number;
   }) => void;
@@ -39,6 +41,8 @@ export default function EditarTarefaModal({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [painel, setPainel] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [tempo_planejado_estudo, setTempoDeEstudo] = useState(null);
+  const [mostrarPickerdeHora, setMostrarPicker] = useState(false)
 
   // Preencher campos quando estiver editando
   React.useEffect(() => {
@@ -47,6 +51,7 @@ export default function EditarTarefaModal({
       setDescricao(tarefaParaEditar.descricao || '');
       setPrioridade(tarefaParaEditar.prioridade || 1);
       setNota(tarefaParaEditar.nota?.toString() || '');
+      setTempoDeEstudo(tarefaParaEditar.tempo_planejado_estudo || null);
       const vencimento = tarefaParaEditar.data_vencimento?.slice(0, 10) || '';
       setDataVencimento(vencimento);
       if (vencimento) {
@@ -60,6 +65,7 @@ export default function EditarTarefaModal({
       setPrioridade(1);
       setNota(null);
       setDataVencimento('');
+      setTempoDeEstudo(null);
       setSelectedDate(new Date());
     }
   }, [tarefaParaEditar, visible]);
@@ -80,6 +86,7 @@ export default function EditarTarefaModal({
       descricao: descricao.trim(),
       prioridade,
       nota,
+      tempo_planejado_estudo,
       data_vencimento: dataVencimento || undefined,
       painel_id: painel
     });
@@ -88,6 +95,7 @@ export default function EditarTarefaModal({
     setDescricao('');
     setPrioridade(1);
     setNota(null);
+    setTempoDeEstudo(null);
     setDataVencimento('');
     setSelectedDate(new Date());
     setShowDatePicker(false);
@@ -262,6 +270,24 @@ export default function EditarTarefaModal({
               />
             )}
           </View>
+          
+          {/* Tempo de estudo */}
+          <View className='mb-4'>
+            <Text className={`mb-2 font-medium ${textColor}`} style={{ fontSize }}>
+              Tempo planejado de estudo
+            </Text>
+            <View className='flex-row items-center justify-between'>
+              <Text className={`font-bold ${textColor}`} style={{ fontSize }}>
+                {tempo_planejado_estudo ?? "--:--:--"}
+              </Text>
+              <TouchableOpacity className='rounded-lg bg-blue-600 px-4 py-2'
+              onPress={() => setMostrarPicker(true)}>
+                <Text className='text-white font-bold'>
+                  Alterar
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Painel */}
           <View className="mb-6">
@@ -309,6 +335,19 @@ export default function EditarTarefaModal({
           </View>
         </View>
       </View>
+      <TimerPickerModal
+        visible={mostrarPickerdeHora}
+        setIsVisible={setMostrarPicker}
+        onConfirm={(duracaoEscolhida) => {
+          setTempoDeEstudo( 
+            duracaoEscolhida.days === 0 && duracaoEscolhida.hours === 0 && duracaoEscolhida.minutes === 0 && duracaoEscolhida.seconds === 0 ? null : 
+            `${String(duracaoEscolhida.hours).padStart(2, "0")}:${String(duracaoEscolhida.minutes).padStart(2, "0")}:${String(duracaoEscolhida.seconds).padStart(2, "0")}`
+          );
+          setMostrarPicker(false);
+        }}
+        modalTitle='Tempo planejado de estudo'
+        onCancel={() => setTempoDeEstudo(null)}
+      />
     </Modal>
   );
 }

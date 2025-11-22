@@ -24,6 +24,8 @@ export function createTables(db) {
                 prioridade INTEGER DEFAULT 1,
                 data_envio TEXT NOT NULL,
                 data_vencimento TEXT,
+                tempo_estudado TEXT,
+                tempo_planejado_estudo TEXT,
                 ordem INTEGER NOT NULL,
                 painel_id INTEGER,
                 nota INTEGER DEFAULT NULL,
@@ -99,6 +101,16 @@ export function migrateDatabase(db) {
         if (!columnNames.includes('data_atualizacao')) {
             db.execSync(`ALTER TABLE Anotacao ADD COLUMN data_atualizacao TEXT DEFAULT CURRENT_TIMESTAMP`);
             console.log('✅ Coluna data_atualizacao adicionada');
+        }
+
+        if (!columnNames.includes('tempo_estudado')) {
+            db.execSync(`ALTER TABLE Anotacao ADD COLUMN tempo_estudado TEXT`);
+            console.log('✅ Coluna tempo_estudado adicionada');
+        }
+
+        if (!columnNames.includes('tempo_planejado_estudo')) {
+            db.execSync(`ALTER TABLE Anotacao ADD COLUMN tempo_planejado_estudo TEXT`);
+            console.log('✅ Coluna tempo_estudado adicionada');
         }
         
         // Verificar e migrar tabela Nota
