@@ -8,6 +8,7 @@ type RelogioProps = {
     selectedAnotacao?: AnotacaoEntity;
     onStop: (elapsedTime: number) => void;
     onReset: () => void;
+    onPlannedTimerReached: () => void;
 }
 
 function Relogio (
@@ -15,7 +16,8 @@ function Relogio (
         fontSize,
         selectedAnotacao,
         onStop,
-        onReset
+        onReset,
+        onPlannedTimerReached
     } : RelogioProps
 ) {
     const [isRunning, setIsRunning] = useState(false);
@@ -24,13 +26,13 @@ function Relogio (
     const intervalIdRef = useRef(null);
     const startTimeRef = useRef(0);
 
-    const totalElapsedTime = previousStudyTime + currentSessionTime;
+    let totalElapsedTime = previousStudyTime + currentSessionTime;
     const hasReachedLimit = selectedAnotacao?.tempo_planejado_estudo && parseHHMMSS(selectedAnotacao?.tempo_planejado_estudo) < totalElapsedTime;
 
     useEffect(() => {
         if (isRunning) {
             startTimeRef.current = Date.now() - currentSessionTime;
-            if(hasReachedLimit) stop();
+            if(hasReachedLimit) {timeUp(); return;};
             intervalIdRef.current = setInterval(() => {
                 setCurrentSessionTime(Date.now() - startTimeRef.current);
             }, 10);
@@ -57,8 +59,14 @@ function Relogio (
         }
     }, [selectedAnotacao]);
 
+    function timeUp() {
+        totalElapsedTime = Math.floor(totalElapsedTime);
+        stop();
+        onPlannedTimerReached();
+    }
+
     function start() {
-        if(hasReachedLimit) return;
+        if(hasReachedLimit) {timeUp(); return;};
         setIsRunning(true);
     }
 

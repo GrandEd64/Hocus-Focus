@@ -18,6 +18,7 @@ export default function TimerScreen ({
 
     const [anotacoes, setAnotacoes] = useState([] as AnotacaoEntity[]);
     const [currentAnotacao, setCurrentAnotacao] = useState(null as AnotacaoEntity);
+    const [antingiuTempoPlanejado, setAtingiuTempo] = useState(false);
 
     const carregarAnotacoes = useCallback(async () => {
         if (!services?.painel || !services?.anotacao) {
@@ -50,6 +51,8 @@ export default function TimerScreen ({
         })();
     }, [services, carregarAnotacoes]);
 
+    useEffect(() => setAtingiuTempo(false), [currentAnotacao]);
+
     const atualizarAnotacao = async (a : AnotacaoEntity) => {
         const anotacaoInstance = new Anotacao(a);
         await services.anotacao.update(a.id, anotacaoInstance);
@@ -67,6 +70,7 @@ export default function TimerScreen ({
 
     async function resetTempoEstudado() {
         currentAnotacao.tempo_estudado = null;
+        setAtingiuTempo(false);
         await atualizarAnotacao(currentAnotacao);
     }
 
@@ -124,12 +128,30 @@ export default function TimerScreen ({
                 selectedAnotacao={currentAnotacao}
                 onStop={(time) => pause(time)}
                 onReset={() => resetTempoEstudado()}
+                onPlannedTimerReached={() => setAtingiuTempo(true)}
                 />
                 {currentAnotacao && (
-                    <View className="justify-center items-center p-3">
-                        <Text style={{fontSize: fontSize + 3}}>
+                    <View className="justify-center items-center p-4 bg-blue-100 rounded-lg mx-3 my-2">
+                        {antingiuTempoPlanejado && (
+                            <Text className="text-red-400 font-semibold mb-2" style={{fontSize: fontSize + 4}}>
+                                Tempo planejado atingido!
+                            </Text>
+                        )}
+                        <Text className="font-medium text-center mb-2" style={{fontSize: fontSize + 2}}>
                             {currentAnotacao.descricao}
                         </Text>
+                        {currentAnotacao.tempo_planejado_estudo && (
+                            <View className="flex-row items-center justify-center">
+                                <MaterialIcons 
+                                name="schedule" 
+                                size={12} 
+                                color={"#94a3b8"} 
+                                />
+                                <Text className="text-slate-600 text-center ml-1" style={{fontSize: fontSize - 2}}>
+                                Planejado: {currentAnotacao.tempo_planejado_estudo}
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 )}
             </View>

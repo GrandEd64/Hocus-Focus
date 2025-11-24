@@ -338,6 +338,19 @@ export default function EditarTarefaModal({
       <TimerPickerModal
         visible={mostrarPickerdeHora}
         setIsVisible={setMostrarPicker}
+        initialValue={
+          tempo_planejado_estudo
+            ? (() => {
+                const parts = tempo_planejado_estudo.split(':');
+                return {
+                  days: 0,
+                  hours: Number(parts[0]) || 0,
+                  minutes: Number(parts[1]) || 0,
+                  seconds: Number(parts[2]) || 0,
+                };
+              })()
+            : { days: 0, hours: 0, minutes: 0, seconds: 0 }
+        }
         onConfirm={(duracaoEscolhida) => {
           setTempoDeEstudo( 
             duracaoEscolhida.days === 0 && duracaoEscolhida.hours === 0 && duracaoEscolhida.minutes === 0 && duracaoEscolhida.seconds === 0 ? null : 
@@ -346,7 +359,7 @@ export default function EditarTarefaModal({
           setMostrarPicker(false);
         }}
         modalTitle='Tempo planejado de estudo'
-        onCancel={() => setTempoDeEstudo(null)}
+        onCancel={() => setMostrarPicker(false)}
       />
     </Modal>
   );
