@@ -67,7 +67,7 @@ export function CalendarScreen({ darkMode, fontSize }: CalendarScreenProps) {
   const { paineis, loading: loadingPaineis, criarPainel, excluirPainel, recarregar } = usePaineis();
   
   // ✅ Obter as funções do hook useAnotacoes
-  const { anotacoes, loading: loadingAnotacoes, atualizarAnotacao, excluirAnotacao, criarAnotacao } = useAnotacoes();
+  const { anotacoes, loading: loadingAnotacoes, atualizarAnotacao, excluirAnotacao, criarAnotacao } = useAnotacoes(null, true);
 
   useEffect(() => {
     async function fetchAtividades() {

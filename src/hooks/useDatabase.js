@@ -137,7 +137,7 @@ export function usePaineis() {
 /**
  * Hook para gerenciar anotações
  */
-export function useAnotacoes(painelId = null) {
+export function useAnotacoes(painelId = null, allWithPanel = false) {
   const { services, isReady } = useDatabase();
   const [anotacoes, setAnotacoes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -154,7 +154,7 @@ export function useAnotacoes(painelId = null) {
       
       const result = painelId 
         ? await services.anotacao.findByPainel(painelId)
-        : await services.anotacao.findAllwithNoPanel();
+        : allWithPanel ? await services.anotacao.findAll() : await services.anotacao.findAllwithNoPanel();
         
       console.log('🔍 Anotações encontradas:', result);
       console.log('🔍 Quantidade de anotações:', result.length);
